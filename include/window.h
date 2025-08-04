@@ -2,7 +2,7 @@
 #include <GLFW/glfw3.h>
 #include <glad/glad.h>
 #include "global_header.h"
-#include "renderer.h"
+#include "input_listener.h"
 
 
 namespace Lefishe {
@@ -13,6 +13,7 @@ namespace Lefishe {
 		UINT screen_width = 1280;
 		UINT screen_height = 720;
 		STRINGVIEW name = "Lefishe Renderer";
+		BOOL is_full_screen = false;
 	};
 
 	struct FrameData {
@@ -27,13 +28,15 @@ namespace Lefishe {
 		Window(const WindowConfig& config);
 		Window() = default;
 
-		bool setup();
+		BOOL setup();
 		void update();
 		void shutdown();
 
+		WindowObject* get();
+
 	private:
-		bool create();
-		bool initOpenGLLoader();
+		BOOL create();
+		BOOL initOpenGLLoader();
 		//void initImGui();
 		//void newFrameImGui();
 		//void terminateImGui();
@@ -46,8 +49,7 @@ namespace Lefishe {
 		WindowObject* m_window_obj;
 		WindowConfig m_config;
 		FrameData m_framedata;
-
-		Renderer m_renderer;
+		//Renderer m_renderer;
 	};
 
 }

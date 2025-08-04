@@ -7,11 +7,11 @@ Window::Window(const WindowConfig& config)
 {
 }
 
-bool Window::setup() {
+BOOL Window::setup() {
 	return create() && initOpenGLLoader();
 }
 
-bool Window::create() {
+BOOL Window::create() {
 	/* Initialize the library */
 	if (!glfwInit()) {
 		DEBUG_ASSERT(1, "GLFW:: Failed to init!", ErrorLevel::FATAL)
@@ -33,11 +33,11 @@ bool Window::create() {
 	
 	/* Make the window's context current */
 	glfwMakeContextCurrent(m_window_obj);
-
+	glfwSwapInterval(1);
 	return true;
 }
 
-bool Window::initOpenGLLoader() {
+BOOL Window::initOpenGLLoader() {
 	if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) {
 		// Handle initialization failure
 		DEBUG_ASSERT(1, "GLAD:: Failed to load OpenGL!", ErrorLevel::FATAL)
@@ -55,7 +55,9 @@ void Window::update() {
 		// 
 		//OnStart.broadcast(); 
 		//OnUpdate.broadcast();
+		
 
+		
 		//render
 		//render queue draw
 
@@ -76,8 +78,10 @@ void Window::terminate() {
 	glfwTerminate();
 }
 
-
-
 void Window::shutdown() {
 	terminate();
+}
+
+WindowObject* Window::get(){
+	return m_window_obj;
 }

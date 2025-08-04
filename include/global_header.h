@@ -59,14 +59,17 @@ using INT    = std::int32_t;
 using FLOAT  = std::float_t;
 using DOUBLE = std::double_t;
 using STRING = std::string;
-using STRINGVIEW = std::string_view;
+using BOOL   = bool;
 
+using STRINGVIEW = std::string_view;
 using CHAR_STRING = char*;
+
 using SIZE = std::size_t;
 
 using IVEC2 = glm::ivec2;
 using DVEC2 = glm::dvec2;
-using VEC2 = glm::vec2;
-using VEC3 = glm::vec3;
-using VEC4 = glm::vec4;
-using MAT4 = glm::mat4;
+using VEC2  = glm::vec2;
+using VEC3  = glm::vec3;
+using VEC4  = glm::vec4;
+using MAT4  = glm::mat4;
+
