@@ -24,13 +24,15 @@
 #include "glm/glm.hpp"
 
 
+
+
 #ifdef DEBUG_MODE
 
-enum ErrorLevel {
-    INFO,
-    WARNING,
-    FATAL
-};
+    enum ErrorLevel {
+        INFO,
+        WARNING,
+        FATAL
+    };
 
 #define ERROR_LEVEL(level, message) \
     switch(level){ \
@@ -51,25 +53,28 @@ enum ErrorLevel {
     }\
 
 #else
-	#define DEBUG_ASSERT(condition, message, level, type) 
+#define DEBUG_ASSERT(condition, message, level, type) 
 #endif
 
-using UINT   = std::uint32_t;
-using INT    = std::int32_t;
-using FLOAT  = std::float_t;
-using DOUBLE = std::double_t;
-using STRING = std::string;
-using BOOL   = bool;
+namespace Lefishe {
 
-using STRINGVIEW = std::string_view;
-using CHAR_STRING = char*;
+    using UINT = std::uint32_t;
+    using INT = std::int32_t;
+    using FLOAT = std::float_t;
+    using DOUBLE = std::double_t;
+    using STRING = std::string;
+    using BOOL = bool;
 
-using SIZE = std::size_t;
+    using STRINGVIEW = std::string_view;
+    using CHAR_STRING = char*;
 
-using IVEC2 = glm::ivec2;
-using DVEC2 = glm::dvec2;
-using VEC2  = glm::vec2;
-using VEC3  = glm::vec3;
-using VEC4  = glm::vec4;
-using MAT4  = glm::mat4;
+    using SIZE = std::size_t;
 
+    using IVEC2 = glm::ivec2;
+    using DVEC2 = glm::dvec2;
+    using VEC2 = glm::vec2;
+    using VEC3 = glm::vec3;
+    using VEC4 = glm::vec4;
+    using MAT4 = glm::mat4;
+
+}
