@@ -17,10 +17,9 @@ namespace Lefishe {
 	};
 
 	struct FrameData {
-		DOUBLE delta_time;
-		DOUBLE current_time;
-		IVEC2  pixel_curser_pos;
-		VEC2   curser_pos;
+		DOUBLE delta_time        = 0.0;
+		DOUBLE current_time      = 0.0;
+		DOUBLE m_last_frame_time = 0.0;
 	};
 
 	class Window {
@@ -30,26 +29,34 @@ namespace Lefishe {
 
 		BOOL setup();
 		void update();
-		void shutdown();
+		void shutdown() const;
 
 		WindowObject* get();
 
 	private:
 		BOOL create();
 		BOOL initOpenGLLoader();
+
+		void config();
+
 		//void initImGui();
 		//void newFrameImGui();
 		//void terminateImGui();
-		void swapBuffer();
-		void pollEvents();
-		void terminate();
+		void swapBuffer() const;
+		void pollEvents() const;
+		void terminate() const;
 
+		void setDeltaTime();
+		void setCurrentTime();
+		void setLastFrameTime();
 
 	private:
 		WindowObject* m_window_obj;
 		WindowConfig m_config;
 		FrameData m_framedata;
 		//Renderer m_renderer;
+
+
 	};
 
 }

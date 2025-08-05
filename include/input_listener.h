@@ -169,6 +169,7 @@ namespace Lefishe {
 
         static void keyButtonCallback(WindowObject* window, int key, int scancode, int action, int mods);
         static void mouseButtonCallback(WindowObject* window, int button, int action, int mods);
+        static void cursorPosCallback(WindowObject* window, double xpos, double ypos);
 
         void setCallback();
 		//void onUpdate();
@@ -177,6 +178,10 @@ namespace Lefishe {
 		WindowObject* m_window_object = nullptr;
         std::array<BOOL, GLFW_KEY_LAST> m_key_state;
         std::array<BOOL, 3> m_mouse_state;
+
+        IVEC2 m_cursor_pos = IVEC2(0);
+        IVEC2 m_last_cursor_pos = VEC2(0.0f);
+        IVEC2 m_mouse_delta = VEC2(0.0f);
 	};
 
 }

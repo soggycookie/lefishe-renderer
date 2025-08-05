@@ -2,7 +2,7 @@
 
 using namespace Lefishe;
 
-InputListener::InputListener(const WindowObject* obj)
+InputListener::InputListener(WindowObject* obj)
 	: m_window_object(obj)
 { 
 	std::fill(std::begin(m_key_state), std::end(m_key_state), false);
@@ -79,8 +79,26 @@ void InputListener::mouseButtonCallback(WindowObject* window, int button, int ac
 	}
 }
 
+void InputListener::cursorPosCallback(WindowObject* window, double xpos, double ypos) {
+
+	InputListener* instance = static_cast<InputListener*>(glfwGetWindowUserPointer(window));
+
+	if (instance == nullptr) {
+		DEBUG_ASSERT(1, "Input:: Mouse callback can't access instance's pointer!", ErrorLevel::WARNING);
+		return;
+	}
+
+	int x_pos_i = static_cast<int>(xpos);
+	int y_pos_i = static_cast<int>(ypos);
+
+	instance->m_cursor_pos = IVEC2(x_pos_i, y_pos_i);
+	instance->m_mouse_delta = instance->m_last_cursor_pos - IVEC2(x_pos_i, y_pos_i);
+	instance->m_last_cursor_pos = instance->m_cursor_pos;
+}
+
 void InputListener::setCallback() {
 	glfwSetWindowUserPointer(m_window_object, this);
 	glfwSetKeyCallback(m_window_object, keyButtonCallback);
 	glfwSetMouseButtonCallback(m_window_object, mouseButtonCallback);
+	glfwSetCursorPosCallback(m_window_object, cursorPosCallback);
 }

@@ -48,9 +48,16 @@ BOOL Window::initOpenGLLoader() {
 	return true;
 }
 
+void Window::config() {
+
+}
+
 void Window::update() {
 	while (!glfwWindowShouldClose(m_window_obj))
 	{
+		setCurrentTime();
+		setDeltaTime();
+
 		//TODO:
 		// 
 		//OnStart.broadcast(); 
@@ -63,25 +70,39 @@ void Window::update() {
 
 		swapBuffer();
 		pollEvents();
+
+		setLastFrameTime();
 	}
 }
 
-void Window::swapBuffer() {
+void Window::swapBuffer() const {
 	glfwSwapBuffers(m_window_obj);
 }
 
-void Window::pollEvents() {
+void Window::pollEvents() const {
 	glfwPollEvents();
 }
 
-void Window::terminate() {
+void Window::terminate() const {
 	glfwTerminate();
 }
 
-void Window::shutdown() {
+void Window::shutdown() const {
 	terminate();
 }
 
 WindowObject* Window::get(){
 	return m_window_obj;
+}
+
+void Window::setDeltaTime() {
+	m_framedata.delta_time = m_framedata.current_time - m_framedata.m_last_frame_time;
+}
+
+void Window::setCurrentTime() {
+	m_framedata.current_time = glfwGetTime();
+}
+
+void Window::setLastFrameTime() {
+	m_framedata.m_last_frame_time = m_framedata.current_time;
 }
