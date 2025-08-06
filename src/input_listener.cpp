@@ -23,25 +23,25 @@ InputListener& InputListener::operator=(InputListener&& input) noexcept{
 		setCallback();
 	}
 	else {
-		DEBUG_ASSERT(1, "Input:: Self move assignment!", ErrorLevel::WARNING);
+		//DEBUG_ASSERT(1, "Input:: Self move assignment!", ErrorLevel::WARNING);
 	}
 
 	return *this;
 }
 
-BOOL InputListener::isMousePressed(MouseButton mouse) {
+bool InputListener::isMousePressed(MouseButton mouse) {
 	return m_mouse_state[static_cast<int>(mouse)];
 }
 
-BOOL InputListener::isMouseReleased(MouseButton mouse) {
+bool InputListener::isMouseReleased(MouseButton mouse) {
 	return !isMousePressed(mouse);
 }
 
-BOOL InputListener::isKeyPressed(KeyButton key) {
+bool InputListener::isKeyPressed(KeyButton key) {
 	return m_key_state[static_cast<int>(key)];
 }
 
-BOOL InputListener::isKeyReleased(KeyButton key) {
+bool InputListener::isKeyReleased(KeyButton key) {
 	return !isKeyPressed(key);
 }
 
@@ -49,7 +49,7 @@ void InputListener::keyButtonCallback(WindowObject* window, int key, int scancod
 	InputListener* instance = static_cast<InputListener*>(glfwGetWindowUserPointer(window));
 	
 	if (instance == nullptr) {
-		DEBUG_ASSERT(1, "Input:: Key callback can't access instance's pointer!", ErrorLevel::WARNING);
+		LOG_WARN("[INPUT] Key callback can't access instance's pointer!");
 		return;
 	}
 
@@ -65,7 +65,7 @@ void InputListener::mouseButtonCallback(WindowObject* window, int button, int ac
 	InputListener* instance = static_cast<InputListener*>(glfwGetWindowUserPointer(window));
 
 	if (instance == nullptr) {
-		DEBUG_ASSERT(1, "Input:: Mouse callback can't access instance's pointer!", ErrorLevel::WARNING);
+		LOG_WARN( "[INPUT] Mouse callback can't access instance's pointer!");
 		return;
 	}
 
@@ -84,7 +84,7 @@ void InputListener::cursorPosCallback(WindowObject* window, double xpos, double 
 	InputListener* instance = static_cast<InputListener*>(glfwGetWindowUserPointer(window));
 
 	if (instance == nullptr) {
-		DEBUG_ASSERT(1, "Input:: Mouse callback can't access instance's pointer!", ErrorLevel::WARNING);
+		LOG_WARN( "[INPUT] Mouse callback can't access instance's pointer!");
 		return;
 	}
 

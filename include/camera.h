@@ -59,7 +59,7 @@ namespace Lefishe {
 		
 		CameraParam m_camera_params;
 
-		BOOL is_dirty = false;
+		bool is_dirty = false;
 	};
 
 }

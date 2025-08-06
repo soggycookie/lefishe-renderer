@@ -4,6 +4,9 @@
 #include <GLFW/glfw3.h>
 #include <glad/glad.h>
 
+#include "logger.h"
+
+
 
 namespace Lefishe {
 
@@ -89,7 +92,7 @@ namespace Lefishe {
         TAB = GLFW_KEY_TAB,
         BACKSPACE = GLFW_KEY_BACKSPACE,
         INSERT = GLFW_KEY_INSERT,
-        DELETE = GLFW_KEY_DELETE,
+        DEL = GLFW_KEY_DELETE,
         RIGHT = GLFW_KEY_RIGHT,
         LEFT = GLFW_KEY_LEFT,
         DOWN = GLFW_KEY_DOWN,
@@ -159,11 +162,11 @@ namespace Lefishe {
         InputListener& operator=(InputListener&& input) noexcept;
 
 
-		BOOL isMousePressed(MouseButton mouse);
-        BOOL isMouseReleased(MouseButton mouse);
+        bool isMousePressed(MouseButton mouse);
+        bool isMouseReleased(MouseButton mouse);
 
-        BOOL isKeyPressed(KeyButton key);
-        BOOL isKeyReleased(KeyButton key);
+        bool isKeyPressed(KeyButton key);
+        bool isKeyReleased(KeyButton key);
 
 	private:
 

@@ -1,6 +1,11 @@
 #include "application.h"
+#include "logger.h"
 
 int main() {
-	std::unique_ptr<Application> app = std::make_unique<Application>();
+	LOG_INIT();
+
+	Application* app = new Application;
 	app->run();
+
+	delete app;
 }

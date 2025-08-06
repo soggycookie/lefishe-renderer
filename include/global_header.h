@@ -20,41 +20,10 @@
 #include <list>
 #include <thread>
 #include <mutex>
+#include <functional>
 
 #include "glm/glm.hpp"
-
-
-
-
-#ifdef DEBUG_MODE
-
-    enum ErrorLevel {
-        INFO,
-        WARNING,
-        FATAL
-    };
-
-#define ERROR_LEVEL(level, message) \
-    switch(level){ \
-            case ErrorLevel::INFO: \
-                std::cout << "INFO::" << message << std::endl; \
-                break; \
-            case ErrorLevel::WARNING: \
-                std::cout << "WARNING::" << message << std::endl; \
-                break; \
-            case ErrorLevel::FATAL: \
-                std::cout << "FATAL::" << message << std::endl; \
-                break; \
-        }\
-
-#define DEBUG_ASSERT(condition, message, level) \
-    if (condition) { \
-	    ERROR_LEVEL(level, message); \
-    }\
-
-#else
-#define DEBUG_ASSERT(condition, message, level, type) 
-#endif
+#include "logger.h"
 
 namespace Lefishe {
 
@@ -63,10 +32,8 @@ namespace Lefishe {
     using FLOAT = std::float_t;
     using DOUBLE = std::double_t;
     using STRING = std::string;
-    using BOOL = bool;
 
     using STRINGVIEW = std::string_view;
-    using CHAR_STRING = char*;
 
     using SIZE = std::size_t;
 
@@ -76,5 +43,5 @@ namespace Lefishe {
     using VEC3 = glm::vec3;
     using VEC4 = glm::vec4;
     using MAT4 = glm::mat4;
-
+    using TIMESTAMP = std::time_t;
 }

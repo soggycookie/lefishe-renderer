@@ -3,7 +3,7 @@
 #include <glad/glad.h>
 #include "global_header.h"
 #include "input_listener.h"
-
+#include "logger.h"
 
 namespace Lefishe {
 
@@ -27,15 +27,15 @@ namespace Lefishe {
 		Window(const WindowConfig& config);
 		Window() = default;
 
-		BOOL setup();
+		bool setup();
 		void update();
 		void shutdown() const;
 
 		WindowObject* get();
 
 	private:
-		BOOL create();
-		BOOL initOpenGLLoader();
+		bool create();
+		bool initOpenGLLoader();
 
 		void config();
 
