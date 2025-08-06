@@ -52,6 +52,8 @@ void Window::config() {
 }
 
 void Window::update() {
+
+
 	while (!glfwWindowShouldClose(m_window_obj))
 	{
 		setCurrentTime();

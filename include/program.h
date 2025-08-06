@@ -1,9 +1,9 @@
 #pragma once
 #include "global_header.h"
+#include "shader.h"
 
 namespace Lefishe {
 	
-	class Shader;
 
 	class Program {
 	public:
