@@ -1,35 +1,30 @@
 #pragma once
 #include "global_header.h"
-
+#include "component.h"
 
 namespace Lefishe {
 
 	using ObjectID = long;
 	using ComponenetID = int;
 
-	class Component;
-
 	class Object {
 	public:
 		Object();
 
-		void addComponent(const Component& component);
-		void addChild(const Object& obj);
-		void addChild(Object&& obj);
+		void addComponent(BaseComponent& component);
+		void addComponent(BaseComponent&& component);
+		void addChild(std::shared_ptr<Object> obj);
 
-		//void addComponents();
-		//void addChildren();
+		const std::map<ObjectID, std::shared_ptr<Object>>& children() const;
+		const std::map<ComponenetID, BaseComponent>& components() const;
 
-		const std::map<ObjectID, Object>& children() const;
-		const std::map<ComponenetID, Component>& components() const;
-
-		long getID() const;
+		long id() const;
 
 	private:
 		long m_id;
 
-		std::map<ObjectID, Object> m_children;
-		std::map<ComponenetID, Component> m_components;
+		std::map<ObjectID, std::shared_ptr<Object>> m_children;
+		std::map<ComponenetID, BaseComponent> m_components;
 	};
 
 }

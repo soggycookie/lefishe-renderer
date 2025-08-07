@@ -31,7 +31,7 @@ namespace Lefishe {
 		Shader() = default;
 		Shader(STRING& src, PipelineStage type);
 
-		UINT getID() const;
+		UINT id() const;
 		STRING getStageStr() const;
 
 	private:

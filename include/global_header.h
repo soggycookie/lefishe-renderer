@@ -35,7 +35,7 @@ namespace Lefishe {
 
     using STRINGVIEW = std::string_view;
 
-    using SIZE = std::size_t;
+    using SIZE_T = std::size_t;
 
     using IVEC2 = glm::ivec2;
     using DVEC2 = glm::dvec2;

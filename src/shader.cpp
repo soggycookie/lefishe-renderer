@@ -8,7 +8,7 @@ Shader::Shader(STRING& src, PipelineStage type)
 	compile(src);
 }
 
-UINT Shader::getID() const{
+UINT Shader::id() const{
 	return m_id;
 }
 

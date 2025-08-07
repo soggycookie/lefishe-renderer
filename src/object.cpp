@@ -9,34 +9,40 @@ Object::Object()
 {
 }
 
-void Object::addComponent(const Component& component){
+void Object::addComponent(BaseComponent& component){
+	if(m_components.contains(component.id())){
+		LOG_INFO("Object can't add duplicated component!");
+		return;
+	}
+	m_components.insert({component.id(), component});
 
 }
 
-void Object::addChild(const Object& obj){
-	m_children.insert({obj.getID(), obj});
+void Object::addComponent(BaseComponent&& component){
+	if(m_components.contains(component.id())){
+		LOG_INFO("Object can't add duplicated component!");
+		return;
+	}
+	m_components.insert({component.id(), std::move(component)});
+
 }
 
-void Object::addChild(Object&& obj){
-	m_children.insert({obj.getID(), std::move(obj)});
+void Object::addChild(std::shared_ptr<Object> obj){
+	if(m_children.contains(obj->id())){
+		LOG_INFO("Object can't add duplicated child!");
+		return;
+	}
+	m_children.insert({obj->id(), obj});
 }
 
-//void Object::addComponents(){
-//
-//}
-//
-//void Object::addChildren(){
-//
-//}
-
-const std::map<ObjectID, Object>& Object::children() const{
+const std::map<ObjectID, std::shared_ptr<Object>>& Object::children() const{
 	return m_children;
 }
 
-const std::map<ComponenetID, Component>& Object::components() const{
+const std::map<ComponenetID, BaseComponent>& Object::components() const{
 	return m_components;
 }
 
-long Object::getID() const{
+long Object::id() const{
 	return m_id;
 }

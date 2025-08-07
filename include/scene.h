@@ -1,9 +1,9 @@
 #pragma once
 #include "global_header.h"
+#include "object.h"
 
 namespace Lefishe {
 	
-	class Object;
 
 	class Scene {
 	public:

@@ -15,7 +15,7 @@ void Program::attach(const Shader& shader) {
         return;
     }
 
-    glAttachShader(m_id, shader.getID());
+    glAttachShader(m_id, shader.id());
     LOG_TRACE("[PROGRAM] ID {0}: {1}", m_id, index);
     m_shader_objs[index++] = shader;
 }

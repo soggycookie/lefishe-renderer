@@ -10,6 +10,10 @@
 using namespace Lefishe;
 
 
+int BaseComponent::id(){
+	return m_id;
+}
+
 //Transform Component
 
 const VEC3& TransformComponent::position() const {
@@ -102,7 +106,7 @@ void TransformComponent::constructMatrix() {
 	is_dirty = false;
 }
 
-int TransformComponent::getID(){
+int TransformComponent::id(){
 	m_id = TRANSFORM_ID;
 
 	return m_id;
@@ -197,7 +201,7 @@ void CameraComponent::constructMatrix(){
 	is_dirty = false;
 }
 
-int CameraComponent::getID(){
+int CameraComponent::id(){
 	m_id = CAMERA_ID;
 
 	return m_id;
@@ -206,7 +210,16 @@ int CameraComponent::getID(){
 
 // Mesh Component
 
-int MeshComponent::getID(){
+void MeshData::clear() {
+	indices.clear();
+	vertices.clear();
+	normals.clear();
+	tangents.clear();
+	uv.clear();
+	vertex_colors.clear();
+}
+
+int MeshComponent::id(){
 	m_id = MESH_ID;
 
 	return m_id;
@@ -230,7 +243,7 @@ const std::vector<VEC2>& MeshComponent::uv() const{
 	return m_data.uv;
 }
 
-const std::vector<VEC3>& MeshComponent::vertexColors() const{
+const std::vector<VEC4>& MeshComponent::vertexColors() const{
 	return m_data.vertex_colors;
 }
 
@@ -258,7 +271,7 @@ void MeshComponent::uv(const std::vector<VEC2>& uv){
 	m_data.uv = uv;
 }
 
-void MeshComponent::vertexColors(const std::vector<VEC3>& vertex_colors){
+void MeshComponent::vertexColors(const std::vector<VEC4>& vertex_colors){
 	m_data.vertex_colors = vertex_colors;
 }
 
@@ -286,7 +299,7 @@ void MeshComponent::uv(std::vector<VEC2>&& uv){
 	m_data.uv = std::move(uv);
 }
 
-void MeshComponent::vertexColors(std::vector<VEC3>&& vertex_colors){
+void MeshComponent::vertexColors(std::vector<VEC4>&& vertex_colors){
 	m_data.vertex_colors = std::move(vertex_colors);
 }
 

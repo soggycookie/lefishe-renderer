@@ -6,7 +6,7 @@ namespace Lefishe {
 
 	class BaseComponent {
 	public:
-		virtual int getID() = 0;
+		virtual int id();
 
 	protected:
 		int m_id = 0;
@@ -33,7 +33,7 @@ namespace Lefishe {
 
 		void constructMatrix();
 
-		int getID() override;
+		int id() override;
 
 	private:
 		VEC3 m_position = glm::vec3(0.0f);
@@ -91,7 +91,7 @@ namespace Lefishe {
 
 		void constructMatrix();
 
-		int getID() override;
+		int id() override;
 
 	private:
 		void check();
@@ -110,11 +110,14 @@ namespace Lefishe {
 
 	struct MeshData{
 		std::vector<VEC3> vertices;
-		std::vector<VEC2> uv;
-		std::vector<VEC3> vertex_colors;
 		std::vector<VEC3> normals;
 		std::vector<VEC3> tangents;
+		std::vector<VEC4> vertex_colors;
+		std::vector<VEC2> uv;
 		std::vector<UINT> indices;
+
+
+		void clear();
 	};
 
 	class MeshComponent : public BaseComponent{
@@ -125,7 +128,7 @@ namespace Lefishe {
 
 		const std::vector<VEC3>& vertices() const;
 		const std::vector<VEC2>& uv() const;
-		const std::vector<VEC3>& vertexColors() const;
+		const std::vector<VEC4>& vertexColors() const;
 		const std::vector<VEC3>& normals() const;
 		const std::vector<VEC3>& tangents() const;
 		const std::vector<UINT>& indices() const;
@@ -133,7 +136,7 @@ namespace Lefishe {
 
 		void vertices(const std::vector<VEC3>& vertices);
 		void uv(const std::vector<VEC2>& uv);
-		void vertexColors(const std::vector<VEC3>& vertex_colors);
+		void vertexColors(const std::vector<VEC4>& vertex_colors);
 		void normals(const std::vector<VEC3>& normals);
 		void tangents(const std::vector<VEC3>& tangents);
 		void indices(const std::vector<UINT>& indices);
@@ -141,7 +144,7 @@ namespace Lefishe {
 
 		void vertices(std::vector<VEC3>&& vertices);
 		void uv(std::vector<VEC2>&& uv);
-		void vertexColors(std::vector<VEC3>&& vertex_colors);
+		void vertexColors(std::vector<VEC4>&& vertex_colors);
 		void normals(std::vector<VEC3>&& normals);
 		void tangents(std::vector<VEC3>&& tangents);
 		void indices(std::vector<UINT>&& indices);
@@ -149,7 +152,7 @@ namespace Lefishe {
 
 		int vertexSize() const;
 
-		int getID() override;
+		int id() override;
 
 	private:
 		MeshData m_data;
