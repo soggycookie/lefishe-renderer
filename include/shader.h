@@ -3,8 +3,6 @@
 #include <GLFW/glfw3.h>
 #include <glad/glad.h>
 
-#include "logger.h"
-
 
 namespace Lefishe {
 
@@ -45,7 +43,7 @@ namespace Lefishe {
 
 	class ShaderLoader {
 	public:
-		static void parseShader(const STRING & path, ShaderSource & src);
+		static void parseShader(const STRING & path, ShaderSource & src_out);
 	};
 
 }

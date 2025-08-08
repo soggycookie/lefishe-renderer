@@ -31,16 +31,13 @@ STRING Shader::getStageStr() const {
 
 void Shader::clear() {
 	glDeleteShader(m_id);
+    m_id = 0;
 }
 
 void Shader::compile(const STRING& src) {
-
-    if (m_id < 0) {
-        LOG_ERROR("[SHADER] ID {0} is invalid!", m_id);
-    }
-
     if (m_stage == PipelineStage::NONE) {
-        LOG_ERROR( "[SHADER] Pipeline stage is invalid");
+        LOG_WARN( "[SHADER] Pipeline stage is invalid");
+        return;
     }
 
     m_id = glCreateShader(static_cast<UINT>(m_stage));
@@ -125,6 +122,6 @@ void ShaderLoader::parseShader(const STRING& path, ShaderSource& src_out) {
         fstream.close();
     }
     else {
-        LOG_ERROR("[SHADER] {0} can't open!", path);
+        LOG_WARN("[SHADER] {0} can't open!", path);
     }
 }
