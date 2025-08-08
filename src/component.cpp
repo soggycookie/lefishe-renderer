@@ -9,10 +9,9 @@
 
 using namespace Lefishe;
 
-
-int BaseComponent::id(){
-	return m_id;
-}
+//const Component BaseComponent::id() const{
+//	return Component::NONE;
+//}
 
 //Transform Component
 
@@ -106,22 +105,23 @@ void TransformComponent::constructMatrix() {
 	is_dirty = false;
 }
 
-int TransformComponent::id(){
-	m_id = TRANSFORM_ID;
+//const Component TransformComponent::id() const{
+//	return Component::TRANSFORM;
+//}
 
-	return m_id;
+std::type_index TransformComponent::getType() const {
+	return std::type_index(typeid(TransformComponent));
 }
-
 
 //Camera Component
 
 std::shared_ptr<CameraComponent> CameraComponent::m_main_cam = nullptr;
 
-std::shared_ptr<CameraComponent> CameraComponent::getMainCamera() {
+std::shared_ptr<CameraComponent> CameraComponent::main() {
 	return m_main_cam;
 }
 
-void CameraComponent::setMainCamera(std::shared_ptr<CameraComponent> main) {
+void CameraComponent::main(std::shared_ptr<CameraComponent> main) {
 	m_main_cam = main;
 }
 
@@ -201,12 +201,13 @@ void CameraComponent::constructMatrix(){
 	is_dirty = false;
 }
 
-int CameraComponent::id(){
-	m_id = CAMERA_ID;
+//const Component CameraComponent::id() const{
+//	return Component::CAMERA;
+//}
 
-	return m_id;
+std::type_index CameraComponent::getType() const {
+	return std::type_index(typeid(CameraComponent));
 }
-
 
 // Mesh Component
 
@@ -219,11 +220,9 @@ void MeshData::clear() {
 	vertex_colors.clear();
 }
 
-int MeshComponent::id(){
-	m_id = MESH_ID;
-
-	return m_id;
-}
+//const Component MeshComponent::id() const{
+//	return Component::MESH;
+//}
 
 MeshComponent::MeshComponent(const MeshData& data)
 	: m_data(data)
@@ -319,7 +318,86 @@ void MeshComponent::data(MeshData&& data){
 	m_data = std::move(data);
 }
 
-int MeshComponent::vertexSize() const{
-	return m_data.vertices.size();
+UINT MeshComponent::vertexSize() const{
+	return vertices().size();
+}
+
+UINT MeshComponent::normalSize() const{
+	return normals().size();
+}
+
+UINT MeshComponent::tangentSize() const{
+	return tangents().size();
+}
+
+UINT MeshComponent::vertexColorSize() const{
+	return vertexColors().size();
+}
+
+UINT MeshComponent::uvSize() const{
+	return uv().size();
+}
+
+UINT MeshComponent::vertexDataSize() const{
+	return vertexSize() + normalSize() + tangentSize() + vertexColorSize() + uvSize();
+}
+
+UINT MeshComponent::indexSize() const{
+	return indices().size();
+}
+
+SIZE_T MeshComponent::vertexByteSize() const{
+	return vertexSize() * sizeof(VEC3);
+}
+
+SIZE_T MeshComponent::normalByteSize() const{
+	return normalSize() * sizeof(VEC3);
+}
+
+SIZE_T MeshComponent::tangentByteSize() const{
+	return tangentSize() * sizeof(VEC3);
+}
+
+SIZE_T MeshComponent::vertexColorByteSize() const{
+	return vertexColorSize() * sizeof(VEC4);
+}
+
+SIZE_T MeshComponent::uvByteSize() const{
+	return uvSize() * sizeof(VEC2);
+}
+
+SIZE_T MeshComponent::indexByteSize() const{
+	return indexSize() * sizeof(UINT);
+}
+
+SIZE_T MeshComponent::vertexDataByteSize() const{
+	return vertexByteSize() + normalByteSize() + tangentByteSize() + vertexColorByteSize() + uvByteSize();
+}
+
+SIZE_T MeshComponent::vertexByteOffset() const{
+	return 0;	
+}
+
+SIZE_T MeshComponent::normalByteOffset() const{
+	return vertexByteOffset() + vertexByteSize();
+}
+
+SIZE_T MeshComponent::tangentByteOffset() const{
+	return normalByteOffset() + normalByteSize();
+}
+
+SIZE_T MeshComponent::vertexColorByteOffset() const{
+	return tangentByteOffset() + tangentByteSize();
+}
+
+SIZE_T MeshComponent::uvByteOffset() const{
+	return vertexColorByteOffset() + vertexColorByteSize();
+}
+SIZE_T MeshComponent::indexByteOffset() const{
+	return uvByteOffset() + uvByteSize();
+}
+
+std::type_index MeshComponent::getType() const {
+	return std::type_index(typeid(MeshComponent));
 }
 

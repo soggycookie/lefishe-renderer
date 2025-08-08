@@ -1,19 +1,26 @@
 #pragma once
 #include "global_header.h"
 
+#define TRANSFORM_ID 0
+#define CAMERA_ID 1
+#define MESH_ID 2
 
 namespace Lefishe {
 
+	enum class Component{
+		NONE = 0,
+		TRANSFORM = TRANSFORM_ID,
+		CAMERA = CAMERA_ID,
+		MESH = MESH_ID
+	};
+
 	class BaseComponent {
 	public:
-		virtual int id();
-
-	protected:
-		int m_id = 0;
+		//virtual const Component id() const;
+		virtual std::type_index getType() const = 0;
 	};
 
 
-#define TRANSFORM_ID 0
 
 	class TransformComponent : public BaseComponent {
 	public:
@@ -33,7 +40,8 @@ namespace Lefishe {
 
 		void constructMatrix();
 
-		int id() override;
+		std::type_index getType() const override;
+		//const Component id() const override;
 
 	private:
 		VEC3 m_position = glm::vec3(0.0f);
@@ -47,7 +55,7 @@ namespace Lefishe {
 		MAT4 m_local_to_world_mtx = glm::mat4(1.0f);
 		MAT4 m_world_to_local_mtx = glm::mat4(1.0f);
 
-		bool is_dirty = false;
+		bool is_dirty = true;
 	};
 
 
@@ -56,7 +64,6 @@ namespace Lefishe {
 #define DEFAULT_FAR_PLANE 1000.0f
 #define DEFAULT_NEAR_PLANE 0.1f
 
-#define CAMERA_ID 1
 
 	struct CameraInfo {
 			FLOAT fov = 90.0f;
@@ -72,8 +79,8 @@ namespace Lefishe {
 	public:
 
 
-		static std::shared_ptr<CameraComponent> getMainCamera();
-		static void setMainCamera(std::shared_ptr<CameraComponent> main);
+		static std::shared_ptr<CameraComponent> main();
+		static void main(std::shared_ptr<CameraComponent> main);
 
 		const MAT4& perspectiveMtx() const;
 
@@ -91,7 +98,8 @@ namespace Lefishe {
 
 		void constructMatrix();
 
-		int id() override;
+		std::type_index getType() const override;
+		//const Component id() const override;
 
 	private:
 		void check();
@@ -101,12 +109,11 @@ namespace Lefishe {
 
 		MAT4 m_perspective_mtx = glm::mat4(1.0f);
 		CameraInfo m_camera_info;
-		bool is_dirty = false;
+		bool is_dirty = true;
 	};
 
 
 
-#define MESH_ID 2
 
 	struct MeshData{
 		std::vector<VEC3> vertices;
@@ -150,9 +157,31 @@ namespace Lefishe {
 		void indices(std::vector<UINT>&& indices);
 		void data(MeshData&& data);
 
-		int vertexSize() const;
+		UINT vertexSize() const;
+		UINT normalSize() const;
+		UINT tangentSize() const;
+		UINT vertexColorSize() const;
+		UINT uvSize() const;
+		UINT indexSize() const;
+		UINT vertexDataSize() const;
 
-		int id() override;
+		SIZE_T vertexByteSize() const;
+		SIZE_T normalByteSize() const;
+		SIZE_T tangentByteSize() const;
+		SIZE_T vertexColorByteSize() const;
+		SIZE_T uvByteSize() const;
+		SIZE_T indexByteSize() const;
+		SIZE_T vertexDataByteSize() const;
+
+		SIZE_T vertexByteOffset() const;
+		SIZE_T normalByteOffset() const;
+		SIZE_T tangentByteOffset() const;
+		SIZE_T vertexColorByteOffset() const;
+		SIZE_T uvByteOffset() const;
+		SIZE_T indexByteOffset() const;
+
+		std::type_index getType() const override;
+		//const Component id() const override;
 
 	private:
 		MeshData m_data;
