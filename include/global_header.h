@@ -6,6 +6,8 @@
 #include <vector>
 #include <map>
 #include <unordered_map>
+#include <set>
+#include <unordered_set>
 #include <queue>
 #include <deque>
 #include <memory>
@@ -21,6 +23,9 @@
 #include <thread>
 #include <mutex>
 #include <functional>
+#include <typeinfo>
+#include <typeindex>
+#include <type_traits>
 
 #include "glm/glm.hpp"
 #include "logger.h"

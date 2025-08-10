@@ -105,6 +105,11 @@ void TransformComponent::constructMatrix() {
 	is_dirty = false;
 }
 
+void TransformComponent::update(){
+	LOG_TRACE("Transform components update!");
+	constructMatrix();
+}
+
 //const Component TransformComponent::id() const{
 //	return Component::TRANSFORM;
 //}
@@ -207,6 +212,10 @@ void CameraComponent::constructMatrix(){
 
 std::type_index CameraComponent::getType() const {
 	return std::type_index(typeid(CameraComponent));
+}
+
+void CameraComponent::update(){
+	constructMatrix();
 }
 
 // Mesh Component
@@ -401,3 +410,5 @@ std::type_index MeshComponent::getType() const {
 	return std::type_index(typeid(MeshComponent));
 }
 
+void MeshComponent::update() {
+}

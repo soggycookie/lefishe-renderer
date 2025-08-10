@@ -18,6 +18,7 @@ namespace Lefishe {
 	public:
 		//virtual const Component id() const;
 		virtual std::type_index getType() const = 0;
+		virtual void update() = 0;
 	};
 
 
@@ -38,10 +39,13 @@ namespace Lefishe {
 		const VEC3& forward() const;
 		const VEC3& up() const;
 
-		void constructMatrix();
 
 		std::type_index getType() const override;
+		void update() override;
 		//const Component id() const override;
+	private:
+		void constructMatrix();
+
 
 	private:
 		VEC3 m_position = glm::vec3(0.0f);
@@ -96,12 +100,13 @@ namespace Lefishe {
 		const FLOAT& farPlane() const;
 		FLOAT& farPlane();
 
-		void constructMatrix();
 
 		std::type_index getType() const override;
 		//const Component id() const override;
+		void update() override;
 
 	private:
+		void constructMatrix();
 		void check();
 
 	private:
@@ -182,6 +187,7 @@ namespace Lefishe {
 
 		std::type_index getType() const override;
 		//const Component id() const override;
+		void update() override;
 
 	private:
 		MeshData m_data;

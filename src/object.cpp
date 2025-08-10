@@ -76,5 +76,15 @@ std::shared_ptr<Object> ObjectFactory::create(){
 	return obj;
 }
 
+void Object::updateComponents(){
+	for(auto& component: m_components){
+		component.second->update();
+	}
+
+	for(auto& child : m_children){
+		child.second->updateComponents();
+	}
+}
+
 
 

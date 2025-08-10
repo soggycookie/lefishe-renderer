@@ -122,6 +122,8 @@ namespace Lefishe {
 
 		long id() const;
 
+		void updateComponents();
+
 	private:
 		bool haveComponent(ComponentID id) const;
 		bool haveComponentInChildren(ComponentID id) const;
