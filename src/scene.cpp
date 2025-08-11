@@ -4,8 +4,8 @@ using namespace Lefishe;
 
 void Scene::addObject(std::shared_ptr<Object> obj){
 	auto o = obj;
-	if(o->haveComponent<MeshComponent>() || 
-	   o->haveComponentInChildren<MeshComponent>())
+	if(o->haveComponent<MeshRendererComponent>() || 
+	   o->haveComponentInChildren<MeshRendererComponent>())
 	{
 		m_render_objs.insert({o->id(), o});	
 			

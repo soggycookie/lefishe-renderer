@@ -106,7 +106,6 @@ void TransformComponent::constructMatrix() {
 }
 
 void TransformComponent::update(){
-	LOG_TRACE("Transform components update!");
 	constructMatrix();
 }
 
@@ -412,3 +411,39 @@ std::type_index MeshComponent::getType() const {
 
 void MeshComponent::update() {
 }
+
+MeshRendererComponent::MeshRendererComponent(std::shared_ptr<MeshComponent> mesh, Material material)
+	:	m_mesh(mesh), m_material(material)
+{	
+}
+
+MeshRendererComponent::MeshRendererComponent(std::shared_ptr<MeshComponent> mesh)
+	: m_mesh(mesh)
+{
+}
+
+void MeshRendererComponent::material(Material material){
+	m_material = material; 
+}
+
+Material& MeshRendererComponent::material(){
+	return m_material;
+}
+
+const Material& MeshRendererComponent::material() const{
+	return m_material;
+}
+
+std::type_index MeshRendererComponent::getType() const{
+	return std::type_index(typeid(MeshRendererComponent));
+}
+
+std::shared_ptr<MeshComponent> MeshRendererComponent::mesh(){
+	return m_mesh.lock();
+}
+
+void MeshRendererComponent::update(){
+}
+
+
+

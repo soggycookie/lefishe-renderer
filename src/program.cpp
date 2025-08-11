@@ -52,6 +52,7 @@ void Program::bind() const {
     
     glUseProgram(m_id);
 }
+
 void Program::clear() {
     glDeleteProgram(m_id);
     m_id = 0;
@@ -61,9 +62,33 @@ Program::UniformInfo Program::getUniform(const std::string& u) const{
     return m_uniforms.at(u);
 }
 
-void Program::setUniform(const std::string& u, const MAT4& val) const{
+
+void Program::setUniform(const std::string& u, const void* data) const{
     auto info = getUniform(u);
-    glUniformMatrix4fv(info.location, 1, GL_FALSE, glm::value_ptr(val));
+
+    switch(info.type){
+        case GL_FLOAT:
+            glUniform1fv(info.location, info.count, static_cast<const float*>(data));
+            break;
+        case GL_FLOAT_VEC2:
+            glUniform2fv(info.location, info.count, static_cast<const float*>(data));
+            break;
+        case GL_FLOAT_VEC3:
+            glUniform3fv(info.location, info.count, static_cast<const float*>(data));
+            break;
+        case GL_FLOAT_VEC4:
+            glUniform4fv(info.location, info.count, static_cast<const float*>(data));
+            break;
+        case GL_FLOAT_MAT4:
+            glUniformMatrix4fv(info.location, info.count, GL_FALSE, static_cast<const float*>(data));
+            break;
+        case GL_INT:
+            glUniform1iv(info.location, info.count, static_cast<const INT*>(data));
+            break;
+        case GL_SAMPLER_2D:
+            glUniform1iv(info.location, info.count, static_cast<const INT*>(data));
+            break;
+    }
 }
 
 void Program::retrieveUniforms(){
@@ -74,7 +99,7 @@ void Program::retrieveUniforms(){
     {
 	    GLint 	max_name_len = 0;
 	    GLsizei length = 0;
-	    GLsizei size = 0;
+	    GLsizei count = 0;
 	    GLenum 	type = GL_NONE;
 	    glGetProgramiv(m_id, GL_ACTIVE_UNIFORM_MAX_LENGTH, &max_name_len);
 	
@@ -84,11 +109,12 @@ void Program::retrieveUniforms(){
 
 	    for (GLint i = 0; i < uniform_count; ++i)
 	    {
-		    glGetActiveUniform(m_id, i, max_name_len, &length, &size, &type, uniform_name.get());
+		    glGetActiveUniform(m_id, i, max_name_len, &length, &count, &type, uniform_name.get());
 
 		    UniformInfo uniform_info;
 		    uniform_info.location = glGetUniformLocation(m_id, uniform_name.get());
-		    uniform_info.size = size;
+		    uniform_info.count = count;
+            uniform_info.type = type;
 
 		    m_uniforms.emplace(std::make_pair(std::string(uniform_name.get(), length), uniform_info));
 	    }

@@ -17,8 +17,8 @@ namespace Lefishe {
 			return std::dynamic_pointer_cast<T>(m_components.at(id));
 		}
 
-		template<typename T>
-		void addComponent(){
+		template<typename T, typename... Args>
+		void addComponent(Args... args){
 
 			static_assert(std::is_base_of<BaseComponent, T>::value, "Derived must be derived from BaseComponent");
 			
@@ -28,12 +28,12 @@ namespace Lefishe {
 				LOG_WARN("{0} is not concrete class of BaseComponent!", id.name());
 			}else{
 				//LOG_TRACE("Added component of type {0}", id.name());
-				m_components.insert({id, std::make_shared<T>()});
+				m_components.insert({id, std::make_shared<T>(std::forward<Args>(args)...)});
 			}
 		}
 
 		template<typename T>
-		void copyComponent(std::shared_ptr<T> obj){
+		void updateComponent(const std::shared_ptr<T>& obj){
 
 			static_assert(std::is_base_of<BaseComponent, T>::value, "Derived must be derived from BaseComponent");
 			
@@ -52,22 +52,9 @@ namespace Lefishe {
 			}
 		}
 
+		
 		template<typename T>
-		void moveComponent(std::shared_ptr<T>&& obj) {
-			static_assert(std::is_base_of<BaseComponent, T>::value, "Derived must be derived from BaseComponent");
-
-			std::type_index id = std::type_index(typeid(T));
-    
-			if (m_components.contains(id)) {
-				LOG_WARN("Component type {0} already exists, skipping move!", id.name());
-				return;
-			}
-
-			m_components.insert({id, std::move(obj)});
-		}
-
-		template<typename T>
-		void addMoveComponent(std::shared_ptr<T>&& obj) {
+		void updateComponent(std::shared_ptr<T>&& obj) {
 			static_assert(std::is_base_of<BaseComponent, T>::value, "Derived must be derived from BaseComponent");
 
 			std::type_index id = std::type_index(typeid(T));
@@ -81,11 +68,25 @@ namespace Lefishe {
 					LOG_WARN("Failed to cast existing component of type {0} to T", id.name());
 				}
 			}else{
-				//LOG_TRACE("Added and moved component of type {0}", id.name());
-				m_components.insert({id, std::move(obj)});
+				LOG_WARN("Object does not contain {0}", id.name());
 			}
 
 		}
+
+		template<typename T>
+		void moveComponent(std::shared_ptr<T>& obj) {
+			static_assert(std::is_base_of<BaseComponent, T>::value, "Derived must be derived from BaseComponent");
+
+			std::type_index id = std::type_index(typeid(T));
+    
+			if (m_components.contains(id)) {
+				LOG_WARN("Component type {0} already exists, skipping move!", id.name());
+				return;
+			}
+
+			m_components.insert({id, std::move(obj)});
+		}
+
 
 		
 		template<typename T>

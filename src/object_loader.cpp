@@ -2,6 +2,16 @@
 #include "object.h"
 
 using namespace Lefishe;
+	
+	ObjectLoader::ObjectLoader(const std::shared_ptr<ProgramManager>& manager)
+		: m_manager(manager)
+	{
+	}
+
+	AssimpObjectLoader::AssimpObjectLoader(const std::shared_ptr<ProgramManager>& manager)
+		: ObjectLoader(manager)
+	{
+	}
 
 	std::shared_ptr<Object> AssimpObjectLoader::loadObject(const std::string& path) {
 		
@@ -91,9 +101,12 @@ using namespace Lefishe;
 					data.indices.push_back(face.mIndices[k]);
 			}
 
+			//TODO: get default material from material manager
+			auto mesh = std::make_shared<MeshComponent>(std::move(data));
+			parent_ptr->addComponent<MeshRendererComponent>(mesh, Material(m_manager->getProgram(DEFAULT_PROGRAM)));
+			parent_ptr->moveComponent<MeshComponent>(mesh);
 			
-			parent_ptr->addMoveComponent(std::make_shared<MeshComponent>(std::move(data)));
-		
+
 			aiMaterial* material = scene->mMaterials[ai_mesh->mMaterialIndex];
 		}
 

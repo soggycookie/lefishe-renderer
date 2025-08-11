@@ -1,22 +1,15 @@
 #pragma once
 #include "global_header.h"
-
-#define TRANSFORM_ID 0
-#define CAMERA_ID 1
-#define MESH_ID 2
+#include "material.h"
 
 namespace Lefishe {
 
-	enum class Component{
-		NONE = 0,
-		TRANSFORM = TRANSFORM_ID,
-		CAMERA = CAMERA_ID,
-		MESH = MESH_ID
-	};
 
 	class BaseComponent {
 	public:
 		//virtual const Component id() const;
+		virtual ~BaseComponent() = default;
+
 		virtual std::type_index getType() const = 0;
 		virtual void update() = 0;
 	};
@@ -185,12 +178,36 @@ namespace Lefishe {
 		SIZE_T uvByteOffset() const;
 		SIZE_T indexByteOffset() const;
 
+
+
+
 		std::type_index getType() const override;
 		//const Component id() const override;
 		void update() override;
 
 	private:
 		MeshData m_data;
+
+	};
+
+
+	class MeshRendererComponent : public BaseComponent{
+	public:
+		MeshRendererComponent(std::shared_ptr<MeshComponent> mesh, Material material);
+		MeshRendererComponent(std::shared_ptr<MeshComponent> mesh);
+		
+		void material(Material material);
+		Material& material();
+		const Material& material() const;
+
+		std::shared_ptr<MeshComponent> mesh();
+
+		std::type_index getType() const override;
+		void update() override;
+
+	private:
+		Material m_material;
+		std::weak_ptr<MeshComponent> m_mesh;
 	};
 
 }

@@ -11,7 +11,8 @@ namespace Lefishe {
 		struct UniformInfo
 		{ 
 			GLint location;
-			GLsizei size;
+			GLsizei count;
+			GLenum type;
 		};
 		
 		Program();
@@ -24,7 +25,7 @@ namespace Lefishe {
 		void clear();
 
 		UniformInfo getUniform(const std::string& u) const;
-		void setUniform(const std::string& u, const MAT4& val) const;
+		void setUniform(const std::string& u, const void* data) const;
 
 	private:
 		void create();
@@ -40,7 +41,8 @@ namespace Lefishe {
 	class ProgramFactory {
 	public:
 		static std::shared_ptr<Program> createProgram(const std::string& path);
-
 	};
+
+
 
 }
