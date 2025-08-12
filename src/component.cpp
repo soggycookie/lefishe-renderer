@@ -6,31 +6,56 @@
 #include <glm/gtx/string_cast.hpp>
 
 #include "component.h"
+#include "object.h"
+
 
 using namespace Lefishe;
+
+BaseComponent::BaseComponent()
+	:m_id(IDGenerator::Generate())
+{
+}
+
+long BaseComponent::id() const{
+	return m_id;
+}
 
 //const Component BaseComponent::id() const{
 //	return Component::NONE;
 //}
 
 //Transform Component
+TransformComponent::TransformComponent(std::shared_ptr<Object> owner, TransformData data)
+	: m_owner(owner), m_data(data)
+{
+	//update();
+}
 
 const VEC3& TransformComponent::position() const {
-	return m_position;
+	return m_data.m_position;
 }
 
 const VEC3& TransformComponent::rotation() const {
-	return m_rotation;
+	return m_data.m_rotation;
+}
+
+const VEC3& TransformComponent::scale() const{
+	return m_data.m_scale;
 }
 
 VEC3& TransformComponent::position() {
 	is_dirty = true;
-	return m_position;
+	return m_data.m_position;
 }
 
 VEC3& TransformComponent::rotation() {
 	is_dirty = true;
-	return m_rotation;
+	return m_data.m_rotation;
+}
+
+VEC3& TransformComponent::scale(){
+	is_dirty = true;
+	return m_data.m_scale;
 }
 
 const VEC3& TransformComponent::right() const {
@@ -57,14 +82,51 @@ const MAT4& TransformComponent::worldToLocalMtx() const {
 	return m_world_to_local_mtx;
 }
 
+
+const MAT4& TransformComponent::localMtx() const{
+	return m_local_mtx;
+}
+
+const MAT4& TransformComponent::globalMtx() const{
+	return m_global_mtx;
+}
+
+void TransformComponent::localMtx(const MAT4& mtx){
+	is_dirty = true;
+	m_local_mtx = mtx;
+}
+
+void TransformComponent::globalMtx(const MAT4& mtx){
+	is_dirty = true;
+	m_global_mtx = mtx;
+}
+
+void TransformComponent::markDirty(){
+	LOG_WARN("MARK DIRTY\n");
+	is_dirty = true;
+}
+
 void TransformComponent::constructMatrix() {
 	if (!is_dirty) {
 		return;
 	}
 
-	float cx = glm::cos(glm::radians(m_rotation.x)), sx = glm::sin(glm::radians(m_rotation.x));
-	float cy = glm::cos(glm::radians(m_rotation.y)), sy = glm::sin(glm::radians(m_rotation.y));
-	float cz = glm::cos(glm::radians(m_rotation.z)), sz = glm::sin(glm::radians(m_rotation.z));
+	if(m_data.m_rotation.x >= 360){
+		m_data.m_rotation.x = m_data.m_rotation.x - 360;
+	}
+
+	if(m_data.m_rotation.y >= 360){
+		m_data.m_rotation.y = m_data.m_rotation.y - 360;
+	}
+
+	if(m_data.m_rotation.z >= 360){
+		m_data.m_rotation.z = m_data.m_rotation.z - 360;
+	}
+
+
+	float cx = glm::cos(glm::radians(m_data.m_rotation.x)), sx = glm::sin(glm::radians(m_data.m_rotation.x));
+	float cy = glm::cos(glm::radians(m_data.m_rotation.y)), sy = glm::sin(glm::radians(m_data.m_rotation.y));
+	float cz = glm::cos(glm::radians(m_data.m_rotation.z)), sz = glm::sin(glm::radians(m_data.m_rotation.z));
 
 	//Z * Y * X order -> X -> Y -> Z
 	//TODO: support quaternion
@@ -97,11 +159,32 @@ void TransformComponent::constructMatrix() {
 	m_up = m_rot_mtx[1];
 	m_forward = m_rot_mtx[2];
 
-	glm::mat4 translation = glm::translate(glm::mat4(1.0f), m_position);
+	glm::mat4 translation = glm::translate(glm::mat4(1.0f), m_data.m_position);
+	glm::mat4 scale = glm::scale(glm::mat4(1.0f), m_data.m_scale);
 
-	m_local_to_world_mtx = translation * m_rot_mtx ;
+	m_local_mtx = translation * m_rot_mtx * scale;
+	
+
+	if(auto owner = m_owner.lock()){
+		auto parent = owner->parent();
+
+		if(parent != nullptr){
+			auto pt = parent->getComponent<TransformComponent>();
+			m_global_mtx = pt->globalMtx() * m_local_mtx;
+			
+		}else{
+			m_global_mtx = m_local_mtx;		
+		}
+		owner->onTransformChanged();
+	}
+
+
+	m_local_to_world_mtx = m_global_mtx ;
 	m_world_to_local_mtx = glm::inverse(m_local_to_world_mtx);
 
+	//LOG_TRACE("global\n {0} \n", glm::to_string(m_global_mtx));
+	//LOG_TRACE("local\n {0} \n", glm::to_string(m_local_mtx));
+	
 	is_dirty = false;
 }
 
@@ -118,6 +201,12 @@ std::type_index TransformComponent::getType() const {
 }
 
 //Camera Component
+
+CameraComponent::CameraComponent(CameraInfo info)
+	: m_camera_info(info)
+{
+	update();
+}
 
 std::shared_ptr<CameraComponent> CameraComponent::m_main_cam = nullptr;
 
