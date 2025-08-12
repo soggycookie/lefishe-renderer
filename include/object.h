@@ -101,7 +101,8 @@ namespace Lefishe {
 			return false;
 		}
 
-	
+		
+		void init();
 
 		void addChild(const std::shared_ptr<Object>& obj);
 
@@ -140,7 +141,7 @@ namespace Lefishe {
 		UINT m_num_children = 0;
 		std::weak_ptr<Object> m_parent;
 		std::weak_ptr<Object> m_root_parent;
-		TransformComponent& m_transform;
+		std::weak_ptr<TransformComponent> m_transform;
 
 		std::unordered_map<ObjectID, std::shared_ptr<Object>> m_children;
 		std::unordered_map<ComponentID, std::shared_ptr<BaseComponent>> m_components;
