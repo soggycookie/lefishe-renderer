@@ -15,11 +15,12 @@ namespace Lefishe{
 
 		const std::shared_ptr<Program> program() const;
 
-		void use() const;
+		void bindAndSetUniform() const;
 
-		void setUniform(STRING name, const void* data);
+		void setUniformData(STRING name, const void* data);
 
 	private:
+		void getUniform();
 
 	private:
 		UINT m_id = 0;
