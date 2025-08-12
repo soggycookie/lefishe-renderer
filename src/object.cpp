@@ -9,7 +9,8 @@ Object::Object()
 {
 }
 
-void Object::addChild(std::shared_ptr<Object> obj){
+
+void Object::addChild(const std::shared_ptr<Object>& obj){
 	if(m_children.contains(obj->id())){
 		LOG_INFO("Object can't add duplicated child!");
 		return;
@@ -69,21 +70,42 @@ long Object::id() const{
 	return m_id;
 }
 
-std::shared_ptr<Object> ObjectFactory::create(){
-	auto obj = std::make_shared<Object>();
-	obj->addComponent<TransformComponent>();
 
-	return obj;
+//void Object::update(){
+//	for(auto& component: m_components){
+//		component.second->update();
+//	}
+//
+//	for(auto& [key, child] : m_children){
+//		child->update();
+//	}
+//}
+
+UINT Object::numChildren() const{
+	return m_num_children;
 }
 
-void Object::updateComponents(){
-	for(auto& component: m_components){
-		component.second->update();
+
+void Object::onTransformChanged(){
+	for(auto& [key, child] : m_children){
+		auto transform = child->getComponent<TransformComponent>();
+		
+		transform->markDirty();
+
+		child->onTransformChanged();
 	}
 
-	for(auto& child : m_children){
-		child.second->updateComponents();
-	}
+
+	//LOG_INFO("children: {0}", m_num_children);
+
+}
+
+
+std::shared_ptr<Object> ObjectFactory::create(){
+	auto obj = std::make_shared<Object>();
+	obj->addComponent<TransformComponent>(obj);
+
+	return obj;
 }
 
 

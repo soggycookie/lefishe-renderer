@@ -1,28 +1,43 @@
 #pragma once
 #include "global_header.h"
 #include "material.h"
+#include "id_generator.h"
 
 namespace Lefishe {
-
+	class Object;
 
 	class BaseComponent {
 	public:
 		//virtual const Component id() const;
+		BaseComponent();
 		virtual ~BaseComponent() = default;
 
 		virtual std::type_index getType() const = 0;
 		virtual void update() = 0;
+
+		long id() const;
+
+	protected:
+		long m_id = 0;
 	};
 
-
+	struct TransformData{
+		VEC3 m_position = glm::vec3(0.0f);
+		VEC3 m_rotation = glm::vec3(0.0f);
+		VEC3 m_scale	= glm::vec3(1.0f);
+	};
 
 	class TransformComponent : public BaseComponent {
 	public:
+		TransformComponent(std::shared_ptr<Object> owner, TransformData data = TransformData{});
+
 		const VEC3& position() const;
 		const VEC3& rotation() const;
+		const VEC3& scale() const;
 
 		VEC3& position();
 		VEC3& rotation();
+		VEC3& scale();
 	
 		const MAT4& rotationMtx() const;
 		const MAT4& localToWorldMtx() const;
@@ -32,6 +47,13 @@ namespace Lefishe {
 		const VEC3& forward() const;
 		const VEC3& up() const;
 
+		const MAT4& localMtx() const;
+		const MAT4& globalMtx() const;
+
+		void localMtx(const MAT4& mtx);
+		void globalMtx(const MAT4& mtx);
+
+		void markDirty();
 
 		std::type_index getType() const override;
 		void update() override;
@@ -41,16 +63,20 @@ namespace Lefishe {
 
 
 	private:
-		VEC3 m_position = glm::vec3(0.0f);
-		VEC3 m_rotation = glm::vec3(0.0f);
+		TransformData m_data;
+		std::weak_ptr<Object> m_owner;
 
-		VEC3 m_right = glm::vec3(1.0f, 0.0f, 0.0f);
-		VEC3 m_up = glm::vec3(0.0f, 1.0f, 0.0f);
-		VEC3 m_forward = glm::vec3(0.0f, 0.0f, 1.0f);
+		VEC3 m_right   = VEC3(1.0f, 0.0f, 0.0f);
+		VEC3 m_up      = VEC3(0.0f, 1.0f, 0.0f);
+		VEC3 m_forward = VEC3(0.0f, 0.0f, 1.0f);
 
-		MAT4 m_rot_mtx = glm::mat4(1.0f);
-		MAT4 m_local_to_world_mtx = glm::mat4(1.0f);
-		MAT4 m_world_to_local_mtx = glm::mat4(1.0f);
+		MAT4 m_rot_mtx = MAT4(1.0f);
+
+		MAT4 m_local_mtx    = MAT4(1.0f);
+		MAT4 m_global_mtx   = MAT4(1.0f);
+
+		MAT4 m_local_to_world_mtx = MAT4(1.0f);
+		MAT4 m_world_to_local_mtx = MAT4(1.0f);
 
 		bool is_dirty = true;
 	};
@@ -74,7 +100,7 @@ namespace Lefishe {
 
 	class CameraComponent : public BaseComponent {
 	public:
-
+		CameraComponent(CameraInfo info = CameraInfo{});
 
 		static std::shared_ptr<CameraComponent> main();
 		static void main(std::shared_ptr<CameraComponent> main);

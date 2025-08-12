@@ -9,12 +9,19 @@ namespace Lefishe {
 
 	class Object : public std::enable_shared_from_this<Object> {
 	public:
+
 		Object();
+
 
 		template<typename T>
 		std::shared_ptr<T> getComponent(){
 			std::type_index id = std::type_index(typeid(T));
-			return std::dynamic_pointer_cast<T>(m_components.at(id));
+			
+			if(m_components.contains(id)){
+				return std::dynamic_pointer_cast<T>(m_components.at(id));
+			}
+			LOG_WARN("This object ID {0} does not have {1}!", m_id, id.name());
+			return nullptr;
 		}
 
 		template<typename T, typename... Args>
@@ -33,7 +40,7 @@ namespace Lefishe {
 		}
 
 		template<typename T>
-		void updateComponent(const std::shared_ptr<T>& obj){
+		void copyComponent(const std::shared_ptr<T>& component){
 
 			static_assert(std::is_base_of<BaseComponent, T>::value, "Derived must be derived from BaseComponent");
 			
@@ -42,19 +49,21 @@ namespace Lefishe {
 			if(m_components.contains(id)){
 				// Update existing component
 				if (auto existing = std::dynamic_pointer_cast<T>(m_components.at(id))) {
-					*existing = *obj; // Use assignment operator for deep copy
+					*existing = *component; // Use assignment operator for deep copy
 					//LOG_TRACE("Updated existing component of type {0}", id.name());
 				} else {
 					LOG_WARN("Failed to cast existing component of type {0} to T", id.name());
 				}
 			}else{
 				LOG_WARN("Object does not contain {0}", id.name());
+
+				return;
 			}
 		}
 
-		
+
 		template<typename T>
-		void updateComponent(std::shared_ptr<T>&& obj) {
+		void moveComponent(std::shared_ptr<T>& component) {
 			static_assert(std::is_base_of<BaseComponent, T>::value, "Derived must be derived from BaseComponent");
 
 			std::type_index id = std::type_index(typeid(T));
@@ -62,34 +71,18 @@ namespace Lefishe {
 			if (m_components.contains(id)) {
 				// Update existing component
 				if (auto existing = std::dynamic_pointer_cast<T>(m_components.at(id))) {
-					existing = std::move(obj);
+					existing = std::move(component);
 					//LOG_TRACE("Updated existing component of type {0}", id.name());
 				} else {
 					LOG_WARN("Failed to cast existing component of type {0} to T", id.name());
 				}
-			}else{
-				LOG_WARN("Object does not contain {0}", id.name());
 			}
 
+            m_components.insert({id, std::move(component)});
 		}
-
-		template<typename T>
-		void moveComponent(std::shared_ptr<T>& obj) {
-			static_assert(std::is_base_of<BaseComponent, T>::value, "Derived must be derived from BaseComponent");
-
-			std::type_index id = std::type_index(typeid(T));
-    
-			if (m_components.contains(id)) {
-				LOG_WARN("Component type {0} already exists, skipping move!", id.name());
-				return;
-			}
-
-			m_components.insert({id, std::move(obj)});
-		}
-
 
 		
-		template<typename T>
+        template<typename T>
 		bool haveComponent() const{
 			return m_components.contains(std::type_index(typeid(T)));
 		}
@@ -108,9 +101,9 @@ namespace Lefishe {
 			return false;
 		}
 
+	
 
-
-		void addChild(std::shared_ptr<Object> obj);
+		void addChild(const std::shared_ptr<Object>& obj);
 
 		const std::unordered_map<ObjectID, std::shared_ptr<Object>>& children() const;
 		const std::unordered_map<ComponentID, std::shared_ptr<BaseComponent>>& components() const;
@@ -121,23 +114,33 @@ namespace Lefishe {
 		void parent(std::weak_ptr<Object> parent);
 		void rootParent(std::weak_ptr<Object> root_parent);
 
+		UINT numChildren() const;
+
 		long id() const;
 
-		void updateComponents();
+		//void update();
+		void onTransformChanged();
+
+
+		//to avoid shared_ptr's content re-assigning
+		Object& operator=(const Object& obj) = delete;
+		Object& operator=(Object&& obj)      = delete;
 
 	private:
 		bool haveComponent(ComponentID id) const;
 		bool haveComponentInChildren(ComponentID id) const;
 
 
+
+
 	private:
 
 
 		long m_id;
-		int m_num_children = 0;
+		UINT m_num_children = 0;
 		std::weak_ptr<Object> m_parent;
 		std::weak_ptr<Object> m_root_parent;
-
+		TransformComponent& m_transform;
 
 		std::unordered_map<ObjectID, std::shared_ptr<Object>> m_children;
 		std::unordered_map<ComponentID, std::shared_ptr<BaseComponent>> m_components;

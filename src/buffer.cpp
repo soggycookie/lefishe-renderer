@@ -17,11 +17,27 @@ void Buffer::create(const void* data){
 
 	glCreateBuffers(1, &m_id);
 
+	glNamedBufferStorage(m_id, m_size, data, GL_DYNAMIC_STORAGE_BIT);
+}
+
+void Buffer::create(UINT total_size, const void* data){
+	if(m_id > 0){
+		LOG_WARN("[BUFFER] Buffer is already created!");
+		return;
+	}
+
+	if(m_size > 0){
+		LOG_WARN("[BUFFER] Buffer's size is already defined!");
+		return;
+	}
+
+	glCreateBuffers(1, &m_id);
+
 
 	LOG_TRACE("[BUFFER] ID: {0}", m_id);
 	
 
-	glNamedBufferStorage(m_id, m_size, data, GL_DYNAMIC_STORAGE_BIT);
+	glNamedBufferStorage(m_id, total_size, data, GL_DYNAMIC_STORAGE_BIT);
 }
 
 void Buffer::clear(){
