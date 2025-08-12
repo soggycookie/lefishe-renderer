@@ -27,6 +27,8 @@ namespace Lefishe {
 		UniformInfo getUniform(const std::string& u) const;
 		void setUniform(const std::string& u, const void* data) const;
 
+		const std::unordered_map<std::string, UniformInfo>& uniform() const;
+
 	private:
 		void create();
 		void retrieveUniforms();

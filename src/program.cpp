@@ -107,20 +107,28 @@ void Program::retrieveUniforms(){
 
 
 
-	    for (GLint i = 0; i < uniform_count; ++i)
+        INT block_index = 0;
+	    for (UINT i = 0; i < uniform_count; ++i)
 	    {
 		    glGetActiveUniform(m_id, i, max_name_len, &length, &count, &type, uniform_name.get());
+           
+            glGetActiveUniformsiv(m_id, 1,  &i, GL_UNIFORM_BLOCK_INDEX, &block_index);
 
-		    UniformInfo uniform_info;
-		    uniform_info.location = glGetUniformLocation(m_id, uniform_name.get());
-		    uniform_info.count = count;
-            uniform_info.type = type;
+            if(block_index == -1){
+		        UniformInfo uniform_info;
+		        uniform_info.location = glGetUniformLocation(m_id, uniform_name.get());
+		        uniform_info.count = count;
+                uniform_info.type = type;
 
-		    m_uniforms.emplace(std::make_pair(std::string(uniform_name.get(), length), uniform_info));
+		        m_uniforms.emplace(std::make_pair(std::string(uniform_name.get(), length), uniform_info));
+            }
 	    }
     }
 }
 
+const std::unordered_map<std::string, Program::UniformInfo>& Program::uniform() const{
+    return m_uniforms;
+}
 
 std::shared_ptr<Program> ProgramFactory::createProgram(const std::string& path){
     auto program = std::make_shared<Program>();
