@@ -14,10 +14,10 @@ namespace Lefishe {
 	class Renderer {
 	public:
 		void draw(const std::vector<DrawCall>& drawcalls);
-		void setupMainCamera(std::shared_ptr<Object> cam);
+
 
 	private:
-		Buffer m_cam_ubo = Buffer(sizeof(MAT4) * 2);
+
 	};
 
 }
