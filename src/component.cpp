@@ -102,7 +102,6 @@ void TransformComponent::globalMtx(const MAT4& mtx){
 }
 
 void TransformComponent::markDirty(){
-	LOG_WARN("MARK DIRTY\n");
 	is_dirty = true;
 }
 
@@ -169,7 +168,7 @@ void TransformComponent::constructMatrix() {
 		auto parent = owner->parent();
 
 		if(parent != nullptr){
-			auto pt = parent->getComponent<TransformComponent>();
+			auto pt = parent->transform();
 			m_global_mtx = pt->globalMtx() * m_local_mtx;
 			
 		}else{

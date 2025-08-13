@@ -9,6 +9,10 @@ Object::Object()
 {
 }
 
+void Object::init(){
+	addComponent<TransformComponent>(shared_from_this());
+	m_transform = getComponent<TransformComponent>();
+}
 
 void Object::addChild(const std::shared_ptr<Object>& obj){
 	if(m_children.contains(obj->id())){
@@ -41,14 +45,18 @@ std::shared_ptr<Object> Object::rootParent() const{
 	return m_root_parent.lock();
 }
 
+std::shared_ptr<TransformComponent> Object::transform() const{
+	return m_transform.lock();
+}
+
+
 bool Object::haveComponent(ComponentID id) const{
 	return m_components.contains(id);
 }
 
 bool Object::haveComponentInChildren(ComponentID id) const{
 	for(const auto& child : m_children){
-		if(child.second->haveComponent(id) || 
-		   child.second->haveComponentInChildren(id))
+		if(child.second->haveComponent(id))
 		{
 			return true;
 		}	
@@ -69,17 +77,11 @@ void Object::rootParent(std::weak_ptr<Object> root_parent){
 long Object::id() const{
 	return m_id;
 }
+		
+void Object::copyObject(const Object& obj){
 
+}
 
-//void Object::update(){
-//	for(auto& component: m_components){
-//		component.second->update();
-//	}
-//
-//	for(auto& [key, child] : m_children){
-//		child->update();
-//	}
-//}
 
 UINT Object::numChildren() const{
 	return m_num_children;
@@ -88,22 +90,16 @@ UINT Object::numChildren() const{
 
 void Object::onTransformChanged(){
 	for(auto& [key, child] : m_children){
-		auto transform = child->getComponent<TransformComponent>();
-		
-		transform->markDirty();
-
+		auto t = child->transform();
+		t->markDirty();
 		child->onTransformChanged();
 	}
-
-
-	//LOG_INFO("children: {0}", m_num_children);
-
 }
 
 
 std::shared_ptr<Object> ObjectFactory::create(){
 	auto obj = std::make_shared<Object>();
-	obj->addComponent<TransformComponent>(obj);
+	obj->init();
 
 	return obj;
 }

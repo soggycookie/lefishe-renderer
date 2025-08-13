@@ -9,6 +9,7 @@ namespace Lefishe {
 
 	class Object : public std::enable_shared_from_this<Object> {
 	public:
+		friend class TransformComponent;
 
 		Object();
 
@@ -90,15 +91,7 @@ namespace Lefishe {
 		template<typename T>
 		bool haveComponentInChildren() const{
 			std::type_index id = std::type_index(typeid(T));
-			for(const auto& child : m_children){
-				if(child.second->haveComponent(id) || 
-				   child.second->haveComponentInChildren(id))
-				{
-					return true;
-				}	
-			}
-
-			return false;
+			return haveComponentInChildren(id);
 		}
 
 		
@@ -111,6 +104,7 @@ namespace Lefishe {
 
 		std::shared_ptr<Object> parent() const;
 		std::shared_ptr<Object> rootParent() const;
+		std::shared_ptr<TransformComponent> transform() const;
 
 		void parent(std::weak_ptr<Object> parent);
 		void rootParent(std::weak_ptr<Object> root_parent);
@@ -119,9 +113,7 @@ namespace Lefishe {
 
 		long id() const;
 
-		//void update();
-		void onTransformChanged();
-
+		void copyObject(const Object& obj);
 
 		//to avoid shared_ptr's content re-assigning
 		Object& operator=(const Object& obj) = delete;
@@ -130,8 +122,7 @@ namespace Lefishe {
 	private:
 		bool haveComponent(ComponentID id) const;
 		bool haveComponentInChildren(ComponentID id) const;
-
-
+		void onTransformChanged();
 
 
 	private:

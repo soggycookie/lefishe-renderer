@@ -75,3 +75,5 @@ void Scene::updateObject(const std::shared_ptr<Object>& obj){
 	}
 }
 
+
+
