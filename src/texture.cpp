@@ -1,0 +1,36 @@
+#include "texture.h"
+
+using namespace Lefishe;
+	
+void Texture::create(TextureInfo info){
+	m_info = info;
+
+	glCreateTextures(static_cast<int>(info.type), 1, &m_id);
+	
+	switch(info.type){
+	case TextureType::TEX_2D:
+		glTextureStorage2D(m_id, info.total_mip_levels, static_cast<int>(info.internal_format), info.width, info.height);
+	}
+}
+
+void Texture::subDataTex2D(UINT mip_level, INT x_offset, INT y_offset, UINT width, UINT height, TexturePixelFormat format, TexturePixelType type, const void* data  ){
+	if(m_info.type != TextureType::TEX_2D){
+		LOG_WARN("[TEXTURE] The type of texture is not tex 2D!");
+	}
+
+	glTextureSubImage2D(m_id, mip_level, x_offset, y_offset, width, height, static_cast<int>(format), static_cast<int>(type), data );
+}
+
+	
+void Texture::samplerMode(){
+	glTextureParameteri(m_id, GL_TEXTURE_WRAP_S, GL_REPEAT );
+	glTextureParameteri(m_id, GL_TEXTURE_WRAP_T, GL_REPEAT );
+	glTextureParameteri(m_id, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTextureParameteri(m_id, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+}
+
+void Texture::bind(UINT index){
+	glBindTextureUnit(0 , m_id);
+}
+
+
