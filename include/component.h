@@ -9,16 +9,20 @@ namespace Lefishe {
 	class BaseComponent {
 	public:
 		//virtual const Component id() const;
-		BaseComponent();
+		BaseComponent(std::shared_ptr<Object> owner);
 		virtual ~BaseComponent() = default;
 
 		virtual std::type_index getType() const = 0;
 		virtual void update() = 0;
 
+		std::shared_ptr<Object> owner();
+
+
 		long id() const;
 
 	protected:
 		long m_id = 0;
+		std::weak_ptr<Object> m_owner;
 	};
 
 	struct TransformData{
@@ -64,7 +68,7 @@ namespace Lefishe {
 
 	private:
 		TransformData m_data;
-		std::weak_ptr<Object> m_owner;
+
 
 		VEC3 m_right   = VEC3(1.0f, 0.0f, 0.0f);
 		VEC3 m_up      = VEC3(0.0f, 1.0f, 0.0f);
@@ -100,7 +104,8 @@ namespace Lefishe {
 
 	class CameraComponent : public BaseComponent {
 	public:
-		CameraComponent(CameraInfo info = CameraInfo{});
+		CameraComponent( std::shared_ptr<Object> owner, CameraInfo info = CameraInfo{});
+
 
 		static std::shared_ptr<CameraComponent> main();
 		static void main(std::shared_ptr<CameraComponent> main);
@@ -153,9 +158,9 @@ namespace Lefishe {
 
 	class MeshComponent : public BaseComponent{
 	public:
-		
-		MeshComponent(const MeshData& data);
-		MeshComponent(MeshData&& data);
+		MeshComponent(std::shared_ptr<Object> owner);
+		MeshComponent(std::shared_ptr<Object> owner, MeshData&& data);
+		MeshComponent(std::shared_ptr<Object> owner, const MeshData& data);
 
 		const std::vector<VEC3>& vertices() const;
 		const std::vector<VEC2>& uv() const;
@@ -219,12 +224,10 @@ namespace Lefishe {
 
 	class MeshRendererComponent : public BaseComponent{
 	public:
-		MeshRendererComponent(std::shared_ptr<MeshComponent> mesh, Material material);
-		MeshRendererComponent(std::shared_ptr<MeshComponent> mesh);
+		MeshRendererComponent(std::shared_ptr<Object> owner, std::shared_ptr<MeshComponent> mesh = nullptr, std::shared_ptr<Material> material = nullptr);
 		
-		void material(Material material);
-		Material& material();
-		const Material& material() const;
+		void material(std::shared_ptr<Material> material);
+		std::shared_ptr<Material> material();
 
 		std::shared_ptr<MeshComponent> mesh();
 
@@ -232,8 +235,8 @@ namespace Lefishe {
 		void update() override;
 
 	private:
-		Material m_material;
 		std::weak_ptr<MeshComponent> m_mesh;
+		std::weak_ptr<Material> m_material;
 	};
 
 }

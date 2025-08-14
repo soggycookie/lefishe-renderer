@@ -11,9 +11,13 @@
 
 using namespace Lefishe;
 
-BaseComponent::BaseComponent()
-	:m_id(IDGenerator::Generate())
+BaseComponent::BaseComponent(std::shared_ptr<Object> owner)
+	:m_id(IDGenerator::Generate()), m_owner(owner)
 {
+}
+
+std::shared_ptr<Object> BaseComponent::owner(){
+	return m_owner.lock();
 }
 
 long BaseComponent::id() const{
@@ -25,14 +29,14 @@ long BaseComponent::id() const{
 //}
 
 //Transform Component
-TransformComponent::TransformComponent(std::shared_ptr<Object> owner, TransformData data)
-	: m_owner(owner), m_data(data)
+TransformComponent::TransformComponent( std::shared_ptr<Object> owner, TransformData data)
+	: BaseComponent(owner), m_data(data)
 {
 	//update();
 }
 
 const VEC3& TransformComponent::position() const {
-	return m_data.m_position;
+	return m_data.m_position;	
 }
 
 const VEC3& TransformComponent::rotation() const {
@@ -181,8 +185,6 @@ void TransformComponent::constructMatrix() {
 	m_local_to_world_mtx = m_global_mtx ;
 	m_world_to_local_mtx = glm::inverse(m_local_to_world_mtx);
 
-	//LOG_TRACE("global\n {0} \n", glm::to_string(m_global_mtx));
-	//LOG_TRACE("local\n {0} \n", glm::to_string(m_local_mtx));
 	
 	is_dirty = false;
 }
@@ -201,8 +203,8 @@ std::type_index TransformComponent::getType() const {
 
 //Camera Component
 
-CameraComponent::CameraComponent(CameraInfo info)
-	: m_camera_info(info)
+CameraComponent::CameraComponent(std::shared_ptr<Object> owner, CameraInfo info)
+	: BaseComponent(owner), m_camera_info(info)
 {
 	update();
 }
@@ -320,13 +322,18 @@ void MeshData::clear() {
 //	return Component::MESH;
 //}
 
-MeshComponent::MeshComponent(const MeshData& data)
-	: m_data(data)
+MeshComponent::MeshComponent(std::shared_ptr<Object> owner)
+	: BaseComponent(owner)
 {
 }
 
-MeshComponent::MeshComponent(MeshData&& data)
-	: m_data(std::move(data))
+MeshComponent::MeshComponent(std::shared_ptr<Object> owner, const MeshData& data)
+	: BaseComponent(owner), m_data(data)
+{
+}
+
+MeshComponent::MeshComponent(std::shared_ptr<Object> owner, MeshData&& data)
+	: BaseComponent(owner), m_data(std::move(data))
 {
 }
 
@@ -500,27 +507,20 @@ std::type_index MeshComponent::getType() const {
 void MeshComponent::update() {
 }
 
-MeshRendererComponent::MeshRendererComponent(std::shared_ptr<MeshComponent> mesh, Material material)
-	:	m_mesh(mesh), m_material(material)
+MeshRendererComponent::MeshRendererComponent(std::shared_ptr<Object> owner, std::shared_ptr<MeshComponent> mesh, std::shared_ptr<Material> material)
+	: BaseComponent(owner), m_mesh(mesh), m_material(material)
 {	
 }
 
-MeshRendererComponent::MeshRendererComponent(std::shared_ptr<MeshComponent> mesh)
-	: m_mesh(mesh)
-{
-}
 
-void MeshRendererComponent::material(Material material){
+void MeshRendererComponent::material(std::shared_ptr<Material> material){
 	m_material = material; 
 }
 
-Material& MeshRendererComponent::material(){
-	return m_material;
+std::shared_ptr<Material> MeshRendererComponent::material(){
+	return m_material.lock();
 }
 
-const Material& MeshRendererComponent::material() const{
-	return m_material;
-}
 
 std::type_index MeshRendererComponent::getType() const{
 	return std::type_index(typeid(MeshRendererComponent));
