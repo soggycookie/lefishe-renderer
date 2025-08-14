@@ -3,12 +3,12 @@
 
 using namespace Lefishe;
 	
-	ObjectLoader::ObjectLoader(const std::shared_ptr<ProgramManager>& manager)
+	ObjectLoader::ObjectLoader(const std::shared_ptr<MaterialManager>& manager)
 		: m_manager(manager)
 	{
 	}
 
-	AssimpObjectLoader::AssimpObjectLoader(const std::shared_ptr<ProgramManager>& manager)
+	AssimpObjectLoader::AssimpObjectLoader(const std::shared_ptr<MaterialManager>& manager)
 		: ObjectLoader(manager)
 	{
 	}
@@ -101,10 +101,19 @@ using namespace Lefishe;
 					data.indices.push_back(face.mIndices[k]);
 			}
 
-			//TODO: get default material from material manager
-			auto mesh = std::make_shared<MeshComponent>(std::move(data));
-			parent_ptr->addComponent<MeshRendererComponent>(mesh, Material(m_manager->getProgram(DEFAULT_PROGRAM)));
-			parent_ptr->moveComponent<MeshComponent>(mesh);
+
+			//auto mesh = std::make_shared<MeshComponent>(std::move(data));
+			
+			std::shared_ptr<Material> mat = nullptr;
+			
+			if(auto manager = m_manager.lock()){
+				mat = manager->defaultMaterial();
+				manager->addMaterial(mat);
+			}
+
+			auto mesh = parent_ptr->addComponent<MeshComponent>(data);
+			parent_ptr->addComponent<MeshRendererComponent>(mesh, mat);
+
 			
 
 			aiMaterial* material = scene->mMaterials[ai_mesh->mMaterialIndex];

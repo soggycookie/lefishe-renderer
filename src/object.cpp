@@ -10,8 +10,7 @@ Object::Object()
 }
 
 void Object::init(){
-	addComponent<TransformComponent>(shared_from_this());
-	m_transform = getComponent<TransformComponent>();
+	m_transform = addComponent<TransformComponent>();
 }
 
 void Object::addChild(const std::shared_ptr<Object>& obj){
@@ -37,15 +36,15 @@ const std::unordered_map<ComponentID, std::shared_ptr<BaseComponent>>& Object::c
 	return m_components;
 }
 
-std::shared_ptr<Object> Object::parent() const{
+std::shared_ptr<const Object> Object::parent() const{
 	return m_parent.lock();
 }
 
-std::shared_ptr<Object> Object::rootParent() const{
+std::shared_ptr<const Object> Object::rootParent() const{
 	return m_root_parent.lock();
 }
 
-std::shared_ptr<TransformComponent> Object::transform() const{
+std::shared_ptr<const TransformComponent> Object::transform() const{
 	return m_transform.lock();
 }
 
@@ -90,7 +89,7 @@ UINT Object::numChildren() const{
 
 void Object::onTransformChanged(){
 	for(auto& [key, child] : m_children){
-		auto t = child->transform();
+		auto t = child->m_transform.lock();
 		t->markDirty();
 		child->onTransformChanged();
 	}

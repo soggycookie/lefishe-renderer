@@ -6,7 +6,7 @@
 
 #include "global_header.h"
 #include "component.h"
-#include "program_manager.h"
+#include "material_manager.h"
 
 namespace Lefishe{
 
@@ -16,17 +16,17 @@ namespace Lefishe{
 	class ObjectLoader {
 	public:
 		virtual ~ObjectLoader() = default;
-		ObjectLoader(const std::shared_ptr<ProgramManager>& manager);
+		ObjectLoader(const std::shared_ptr<MaterialManager>& manager);
 
 		virtual std::shared_ptr<Object> loadObject(const std::string& path) = 0;
 
 	protected:
-		std::shared_ptr<ProgramManager> m_manager;
+		std::weak_ptr<MaterialManager> m_manager;
 	};
 
 	class AssimpObjectLoader : public ObjectLoader {
 	public:
-		AssimpObjectLoader(const std::shared_ptr<ProgramManager>& manager);
+		AssimpObjectLoader(const std::shared_ptr<MaterialManager>& manager);
 
 		std::shared_ptr<Object> loadObject(const std::string& path) override;
 	

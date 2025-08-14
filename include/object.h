@@ -11,6 +11,7 @@ namespace Lefishe {
 	public:
 		friend class TransformComponent;
 
+
 		Object();
 
 
@@ -26,7 +27,7 @@ namespace Lefishe {
 		}
 
 		template<typename T, typename... Args>
-		void addComponent(Args... args){
+		std::shared_ptr<T> addComponent(Args... args){
 
 			static_assert(std::is_base_of<BaseComponent, T>::value, "Derived must be derived from BaseComponent");
 			
@@ -34,53 +35,56 @@ namespace Lefishe {
 			
 			if(m_components.contains(id)){
 				LOG_WARN("{0} is not concrete class of BaseComponent!", id.name());
+				return nullptr;
 			}else{
 				//LOG_TRACE("Added component of type {0}", id.name());
-				m_components.insert({id, std::make_shared<T>(std::forward<Args>(args)...)});
+				auto component = std::make_shared<T>(shared_from_this(),std::forward<Args>(args)...);
+				m_components.insert({id, component});
+				return component;
 			}
 		}
 
-		template<typename T>
-		void copyComponent(const std::shared_ptr<T>& component){
+		//template<typename T>
+		//void copyComponent(const std::shared_ptr<T>& component){
 
-			static_assert(std::is_base_of<BaseComponent, T>::value, "Derived must be derived from BaseComponent");
-			
-			std::type_index id = std::type_index(typeid(T));
-			
-			if(m_components.contains(id)){
-				// Update existing component
-				if (auto existing = std::dynamic_pointer_cast<T>(m_components.at(id))) {
-					*existing = *component; // Use assignment operator for deep copy
-					//LOG_TRACE("Updated existing component of type {0}", id.name());
-				} else {
-					LOG_WARN("Failed to cast existing component of type {0} to T", id.name());
-				}
-			}else{
-				LOG_WARN("Object does not contain {0}", id.name());
+		//	static_assert(std::is_base_of<BaseComponent, T>::value, "Derived must be derived from BaseComponent");
+		//	
+		//	std::type_index id = std::type_index(typeid(T));
+		//	
+		//	if(m_components.contains(id)){
+		//		// Update existing component
+		//		if (auto existing = std::dynamic_pointer_cast<T>(m_components.at(id))) {
+		//			*existing = *component; // Use assignment operator for deep copy
+		//			//LOG_TRACE("Updated existing component of type {0}", id.name());
+		//		} else {
+		//			LOG_WARN("Failed to cast existing component of type {0} to T", id.name());
+		//		}
+		//	}else{
+		//		LOG_WARN("Object does not contain {0}", id.name());
 
-				return;
-			}
-		}
+		//		return;
+		//	}
+		//}
 
 
-		template<typename T>
-		void moveComponent(std::shared_ptr<T>& component) {
-			static_assert(std::is_base_of<BaseComponent, T>::value, "Derived must be derived from BaseComponent");
+		//template<typename T>
+		//void moveComponent(std::shared_ptr<T>& component) {
+		//	static_assert(std::is_base_of<BaseComponent, T>::value, "Derived must be derived from BaseComponent");
 
-			std::type_index id = std::type_index(typeid(T));
-    
-			if (m_components.contains(id)) {
-				// Update existing component
-				if (auto existing = std::dynamic_pointer_cast<T>(m_components.at(id))) {
-					existing = std::move(component);
-					//LOG_TRACE("Updated existing component of type {0}", id.name());
-				} else {
-					LOG_WARN("Failed to cast existing component of type {0} to T", id.name());
-				}
-			}
-
-            m_components.insert({id, std::move(component)});
-		}
+		//	std::type_index id = std::type_index(typeid(T));
+  //  
+		//	if (m_components.contains(id)) {
+		//		// Update existing component
+		//		if (auto existing = std::dynamic_pointer_cast<T>(m_components.at(id))) {
+		//			existing = std::move(component);
+		//			//LOG_TRACE("Updated existing component of type {0}", id.name());
+		//		} else {
+		//			LOG_WARN("Failed to cast existing component of type {0} to T", id.name());
+		//		}
+		//	} else {
+		//		m_components.insert({id, std::move(component)});
+		//	}
+		//}
 
 		
         template<typename T>
@@ -102,9 +106,9 @@ namespace Lefishe {
 		const std::unordered_map<ObjectID, std::shared_ptr<Object>>& children() const;
 		const std::unordered_map<ComponentID, std::shared_ptr<BaseComponent>>& components() const;
 
-		std::shared_ptr<Object> parent() const;
-		std::shared_ptr<Object> rootParent() const;
-		std::shared_ptr<TransformComponent> transform() const;
+		std::shared_ptr<const Object> parent() const;
+		std::shared_ptr<const Object> rootParent() const;
+		std::shared_ptr<const TransformComponent> transform() const;
 
 		void parent(std::weak_ptr<Object> parent);
 		void rootParent(std::weak_ptr<Object> root_parent);
