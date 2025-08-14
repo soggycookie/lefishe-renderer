@@ -5,6 +5,8 @@
 #include "input_listener.h"
 #include "logger.h"
 
+#include "event_bus.h"
+
 namespace Lefishe {
 
 	using WindowObject = GLFWwindow;
@@ -55,6 +57,7 @@ namespace Lefishe {
 		WindowConfig m_config;
 		FrameData m_framedata;
 		//Renderer m_renderer;
+		//EventBus<> m_on_start;
 
 
 	};

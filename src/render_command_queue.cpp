@@ -21,11 +21,6 @@ void RenderCommandQueue::submit(const std::unordered_map<ObjectID, std::shared_p
 			Buffer element_buffer(mesh->indexByteSize(), mesh->indices().data());
 		
 			m_drawcalls.emplace_back(vert_buffer, element_buffer ,mesh_renderer , 0);
-		
-			auto t = obj->transform();
-
-			mesh_renderer->material().setUniformData("model", &(t->localToWorldMtx()));
-		
 		}
 
 

@@ -1,5 +1,14 @@
-#include "window.h"
 
+
+#include "window.h"
+#include "scene.h"
+#include "object_loader.h"
+#include "render_command_queue.h"
+#include "renderer.h"
+#include "program_manager.h"
+#include "material_manager.h"
+#include "material.h"
+#include "texture_loader.h"
 
 using namespace Lefishe;
 
@@ -52,22 +61,76 @@ void Window::config() {
 }
 
 void Window::update() {
+	Scene scene;
+	Renderer renderer;
+	RenderCommandQueue queue;
+	
+	auto program_manager = std::make_shared<ProgramManager>();
+	program_manager->add(
+		{
+			{DEFAULT_PROGRAM, ProgramFactory::createProgram("resource/shader/common.shader")}
+		}
+	);
+
+	auto material_manager = std::make_shared<MaterialManager>(program_manager);
+
+	std::unique_ptr<ObjectLoader> loader = std::make_unique<AssimpObjectLoader>(material_manager);
+
+	//auto obj = loader->loadObject("resource/asset/sphere/scene.gltf");
+	//const auto obj3 = loader->loadObject("resource/asset/dragon/dragon.obj");
+	auto obj2 = loader->loadObject("resource/asset/sphere/scene.gltf");
+	auto obj4 = loader->loadObject("resource/asset/sphere/scene.gltf");
+	auto obj5 = loader->loadObject("resource/asset/sphere/scene.gltf");
+	obj4->addChild(obj5);
+	obj5->addChild(obj2);
+
+	//auto t = obj->getComponent<TransformComponent>();
+	auto t4 = obj4->getComponent<TransformComponent>();
+	auto t5 = obj5->getComponent<TransformComponent>();
+	auto t2 = obj2->getComponent<TransformComponent>();
+
+	//t->position() += VEC3(-4, 0, -5);
+
+	t4->position() += VEC3(0, 0, -5);
+	t5->position() += VEC3(3, 0, 0);
+	t2->position() += VEC3(0, 3, 0);
+
+	
+
+	auto cam  = ObjectFactory::create();
+	cam->addComponent<CameraComponent>();
+
+	auto camera = cam->getComponent<CameraComponent>();
+	CameraComponent::main(camera);
+	auto transform = cam->getComponent<TransformComponent>();
+	transform->position() += VEC3(0, 0, 3);
+
+	//auto texture = TextureLoader::load("resource/asset/texture/container.jpg");
 
 
+	scene.addObject(std::move(cam));
+	scene.addObject(std::move(obj4));
+
+
+	queue.submit(scene.renderObjects());
+	
+	//glEnable(GL_DEPTH_TEST);
+	glEnable(GL_CULL_FACE);
+	glCullFace(GL_BACK);
 	while (!glfwWindowShouldClose(m_window_obj))
 	{
 		setCurrentTime();
 		setDeltaTime();
 
-		//TODO:
-		// 
-		//OnStart.broadcast(); 
-		//OnUpdate.broadcast();
+		glClear(GL_COLOR_BUFFER_BIT);
+
+		t4->rotation() += VEC3(0, 45, 0) * VEC3(0, m_framedata.delta_time, 0);
+		t5->rotation() += VEC3(45, 0, 0) * VEC3(m_framedata.delta_time, 0, 0);
 		
 
+		scene.update();
 		
-		//render
-		//render queue draw
+		renderer.draw(queue.drawcall());
 
 		swapBuffer();
 		pollEvents();

@@ -9,18 +9,19 @@ namespace Lefishe {
 
 	//	virtual ~EventBus() = default;
 
-	//	virtual void publish(Args... args) {
+	//	virtual void invoke(Args... args) {
 	//		for (auto& callback : m_callbacks) {
 	//			callback(args...);
 	//		}
 	//	}
 
-	//	virtual void subscribe(EventCallback callback) {
+	//	virtual void addListener(EventCallback callback) {
 	//		m_callbacks.push_back(callback);
 	//	}
 
 	//private:
 	//	std::vector<EventCallback> m_callbacks;
 	//};
+
 
 }

@@ -1,5 +1,6 @@
 #include "draw_call.h"
 #include "component.h"
+#include "object.h"
 
 using namespace Lefishe;
 
@@ -15,8 +16,18 @@ DrawCall::DrawCall(Buffer vertex, Buffer indices, std::shared_ptr<MeshRendererCo
 
 void DrawCall::bind() const
 {
+	if(auto renderer = m_mesh_renderer.lock()){
+		std::shared_ptr<Object> owner = renderer->owner();
+		
+		renderer->material()->setUniformData("model", sizeof(MAT4), &(owner->transform()->localToWorldMtx()));
+		//int a[2] = {1, 1};
+		//renderer->material()->setUniformData("here", sizeof(INT) * 2, a);
+	}
+
+
+
 	if(auto mesh_renderer = m_mesh_renderer.lock()){
-		mesh_renderer->material().bindAndSetUniform();
+		mesh_renderer->material()->bindAndSetUniform();
 	}
 
 	m_current_id = m_vao_id;

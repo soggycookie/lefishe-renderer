@@ -1,0 +1,11 @@
+Model Information:
+* title:	Scifi HexSphere
+* source:	https://sketchfab.com/3d-models/scifi-hexsphere-cb364832b9994b768dba6245e6b3f51b
+* author:	Marco Zakaria (https://sketchfab.com/marcoZakaria)
+
+Model License:
+* license type:	CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)
+* requirements:	Author must be credited. Commercial use is allowed.
+
+If you use this 3D model in your project be sure to copy paste this credit wherever you share it:
+This work is based on "Scifi HexSphere" (https://sketchfab.com/3d-models/scifi-hexsphere-cb364832b9994b768dba6245e6b3f51b) by Marco Zakaria (https://sketchfab.com/marcoZakaria) licensed under CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)
