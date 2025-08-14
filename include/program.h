@@ -10,9 +10,13 @@ namespace Lefishe {
 		
 		struct UniformInfo
 		{ 
+		public:
 			GLint location;
-			GLsizei count;
+			GLint count;
 			GLenum type;
+		public:
+			UniformInfo() = default;
+			UniformInfo(GLint loc, GLint c, GLenum t);
 		};
 		
 		Program();
@@ -24,19 +28,28 @@ namespace Lefishe {
 
 		void clear();
 
-		UniformInfo getUniform(const std::string& u) const;
-		void setUniform(const std::string& u, const void* data) const;
+		UniformInfo getUniform(const STRING& u) const;
+		void setUniform(const STRING& u, const void* data) const;
 
-		const std::unordered_map<std::string, UniformInfo>& uniform() const;
+		const std::unordered_map<STRING, UniformInfo>& uniform() const;
+
+		void getUniformValue(const STRING& name, void* out_data);
+
 
 	private:
 		void create();
 		void retrieveUniforms();
 
+		
+		void getUniformValue(GLint location, GLint size, FLOAT* out_data);
+		void getUniformValue(GLint location, GLint size, INT* out_data);
+		void getUniformValue(GLint location, GLint size, UINT* out_data);
+		void getUniformValue(GLint location, GLint size, DOUBLE* out_data);
+
 	private:
 		UINT m_id;
 		std::array<Shader, 4> m_shader_objs;
-		std::unordered_map<std::string, UniformInfo> m_uniforms;
+		std::unordered_map<STRING, UniformInfo> m_uniforms;
 	};
 
 

@@ -9,6 +9,7 @@ namespace Lefishe{
 	class Material{
 	public:
 		Material() = default;
+		~Material();
 		Material(std::shared_ptr<Program> program);
 
 		UINT id() const;
@@ -17,7 +18,7 @@ namespace Lefishe{
 
 		void bindAndSetUniform() const;
 
-		void setUniformData(STRING name, const void* data);
+		void setUniformData(STRING name, SIZE_T size, const void* data);
 
 	private:
 		void getUniform();
@@ -25,7 +26,7 @@ namespace Lefishe{
 	private:
 		UINT m_id = 0;
 		std::weak_ptr<Program> m_program;
-		std::unordered_map<STRING, const void*> m_uniform_data;
+		std::unordered_map<STRING, void*> m_uniform_data;
 	};
 
 

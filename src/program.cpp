@@ -5,6 +5,11 @@
 
 using namespace Lefishe;
 
+Program::UniformInfo::UniformInfo(GLint loc, GLint c, GLenum t)
+    : location(loc), count(c), type(t)
+{
+}
+
 Program::Program(){
     create();
 }
@@ -58,29 +63,29 @@ void Program::clear() {
     m_id = 0;
 }
 
-Program::UniformInfo Program::getUniform(const std::string& u) const{
+Program::UniformInfo Program::getUniform(const STRING& u) const{
     return m_uniforms.at(u);
 }
 
 
-void Program::setUniform(const std::string& u, const void* data) const{
+void Program::setUniform(const STRING& u, const void* data) const{
     auto info = getUniform(u);
 
     switch(info.type){
         case GL_FLOAT:
-            glUniform1fv(info.location, info.count, static_cast<const float*>(data));
+            glUniform1fv(info.location, info.count, static_cast<const FLOAT*>(data));
             break;
         case GL_FLOAT_VEC2:
-            glUniform2fv(info.location, info.count, static_cast<const float*>(data));
+            glUniform2fv(info.location, info.count, static_cast<const FLOAT*>(data));
             break;
         case GL_FLOAT_VEC3:
-            glUniform3fv(info.location, info.count, static_cast<const float*>(data));
+            glUniform3fv(info.location, info.count, static_cast<const FLOAT*>(data));
             break;
         case GL_FLOAT_VEC4:
-            glUniform4fv(info.location, info.count, static_cast<const float*>(data));
+            glUniform4fv(info.location, info.count, static_cast<const FLOAT*>(data));
             break;
         case GL_FLOAT_MAT4:
-            glUniformMatrix4fv(info.location, info.count, GL_FALSE, static_cast<const float*>(data));
+            glUniformMatrix4fv(info.location, info.count, GL_FALSE, static_cast<const FLOAT*>(data));
             break;
         case GL_INT:
             glUniform1iv(info.location, info.count, static_cast<const INT*>(data));
@@ -106,31 +111,114 @@ void Program::retrieveUniforms(){
 	    auto uniform_name = std::make_unique<char[]>(max_name_len);
 
 
+        //LOG_INFO("{0}", glGetUniformLocation(m_id, "here"));
 
         INT block_index = 0;
 	    for (UINT i = 0; i < uniform_count; ++i)
 	    {
 		    glGetActiveUniform(m_id, i, max_name_len, &length, &count, &type, uniform_name.get());
-           
+            STRING name = STRING(uniform_name.get(), length);
+            if(name.ends_with("[0]")){
+                name = name.substr(0, name.size() - 3);
+            }
+
             glGetActiveUniformsiv(m_id, 1,  &i, GL_UNIFORM_BLOCK_INDEX, &block_index);
 
             if(block_index == -1){
-		        UniformInfo uniform_info;
-		        uniform_info.location = glGetUniformLocation(m_id, uniform_name.get());
-		        uniform_info.count = count;
-                uniform_info.type = type;
+		        GLint location = glGetUniformLocation(m_id, uniform_name.get());
+		        UniformInfo uniform_info(location, count , type);
 
-		        m_uniforms.emplace(std::make_pair(std::string(uniform_name.get(), length), uniform_info));
+		        m_uniforms.emplace(std::make_pair(name, uniform_info));
             }
 	    }
     }
 }
 
-const std::unordered_map<std::string, Program::UniformInfo>& Program::uniform() const{
+const std::unordered_map<STRING, Program::UniformInfo>& Program::uniform() const{
     return m_uniforms;
 }
 
-std::shared_ptr<Program> ProgramFactory::createProgram(const std::string& path){
+
+void Program::getUniformValue(GLint location, GLint size, FLOAT* out_data){
+    glGetnUniformfv(m_id, location, size, out_data);
+}
+
+void Program::getUniformValue(GLint location, GLint size, INT* out_data){
+    glGetnUniformiv(m_id, location, size, out_data);
+}
+
+void Program::getUniformValue(GLint location, GLint size, DOUBLE* out_data){
+    glGetnUniformdv(m_id, location, size, out_data);
+}
+
+void Program::getUniformValue(GLint location, GLint size, UINT* out_data){
+    glGetnUniformuiv(m_id, location, size, out_data);
+}
+
+void Program::getUniformValue(const STRING& name, void* out_data){
+    auto info = m_uniforms[name];
+
+	switch(info.type) {
+	    case GL_FLOAT:
+	    {
+		    FLOAT* data = static_cast<FLOAT*>(out_data);
+		    for(int i = 0; i < info.count; i++) {
+			    getUniformValue(info.location + i, sizeof(FLOAT), &data[i]);
+		    }
+	    }
+	    break;
+	    case GL_FLOAT_VEC2:
+	    {
+		    VEC2* data = static_cast<VEC2*>(out_data);
+		    for(int i = 0; i < info.count; i++) {
+			    getUniformValue(info.location + i, sizeof(VEC2), glm::value_ptr(data[i]));
+		    }
+	    }
+	    break;
+	    case GL_FLOAT_VEC3:
+	    {
+		    VEC3* data = static_cast<VEC3*>(out_data);
+		    for(int i = 0; i < info.count; i++) {
+			    getUniformValue(info.location + i, sizeof(VEC3), glm::value_ptr(data[i]));
+		    }
+	    }
+	    break;
+	    case GL_FLOAT_VEC4:
+	    {
+		    VEC4* data = static_cast<VEC4*>(out_data);
+		    for(int i = 0; i < info.count; i++) {
+			    getUniformValue(info.location + i, sizeof(VEC4), glm::value_ptr(data[i]));
+		    }
+	    }
+	    break;
+	    case GL_FLOAT_MAT4:
+	    {
+		    MAT4* data = static_cast<MAT4*>(out_data);
+		    for(int i = 0; i < info.count; i++) {
+			    getUniformValue(info.location + i, sizeof(MAT4), glm::value_ptr(data[i]));
+		    }
+	    }
+	    break;
+	    case GL_INT :
+	    {
+		    INT* data = static_cast<INT*>(out_data);
+		    for(int i = 0; i < info.count; i++) {
+			    getUniformValue(info.location + i, sizeof(INT), &data[i]);
+		    }
+	    }
+	    break;
+	    case GL_SAMPLER_2D :
+	    {
+		    INT* data = static_cast<INT*>(out_data);
+		    for(int i = 0; i < info.count; i++) {
+			    getUniformValue(info.location + i, sizeof(INT), &data[i]);
+		    }
+	    }
+	    break;
+	}
+}
+
+std::shared_ptr<Program> ProgramFactory::createProgram(const STRING& path){
     auto program = std::make_shared<Program>();
 
     ShaderSource ssrc;
