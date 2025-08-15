@@ -7,6 +7,7 @@
 #include "renderer.h"
 #include "program_manager.h"
 #include "material_manager.h"
+#include "texture_manager.h"
 #include "material.h"
 #include "texture_loader.h"
 
@@ -73,28 +74,37 @@ void Window::update() {
 	);
 
 	auto material_manager = std::make_shared<MaterialManager>(program_manager);
+	auto texture_manager = std::make_shared<TextureManager>();
 
-	std::unique_ptr<ObjectLoader> loader = std::make_unique<AssimpObjectLoader>(material_manager);
+	std::unique_ptr<ObjectLoader> loader = std::make_unique<AssimpObjectLoader>(material_manager, texture_manager);
 
 	//auto obj = loader->loadObject("resource/asset/sphere/scene.gltf");
 	//const auto obj3 = loader->loadObject("resource/asset/dragon/dragon.obj");
-	auto obj2 = loader->loadObject("resource/asset/sphere/scene.gltf");
-	auto obj4 = loader->loadObject("resource/asset/sphere/scene.gltf");
-	auto obj5 = loader->loadObject("resource/asset/sphere/scene.gltf");
-	obj4->addChild(obj5);
-	obj5->addChild(obj2);
+	//auto obj2 = loader->loadObject("resource/asset/sphere/scene.gltf");
+	//auto obj4 = loader->loadObject("resource/asset/sphere/scene.gltf");
+	//auto obj5 = loader->loadObject("resource/asset/sphere/scene.gltf");
+	//auto obj6 = loader->loadObject("resource/asset/dragon/dragon.obj");
+	auto gun = loader->loadObject("resource/asset/drakefire_pistol/scene.gltf");
+	//obj4->addChild(obj5);
+	//obj5->addChild(obj2);
+	//obj2->addChild(obj6);
 
-	//auto t = obj->getComponent<TransformComponent>();
-	auto t4 = obj4->getComponent<TransformComponent>();
-	auto t5 = obj5->getComponent<TransformComponent>();
-	auto t2 = obj2->getComponent<TransformComponent>();
+	////auto t = obj->getComponent<TransformComponent>();
+	//auto t4 = obj4->getComponent<TransformComponent>();
+	//auto t5 = obj5->getComponent<TransformComponent>();
+	//auto t2 = obj2->getComponent<TransformComponent>();
+	//auto t6 = obj6->getComponent<TransformComponent>();
+	auto gun_t = gun->getComponent<TransformComponent>();
 
 	//t->position() += VEC3(-4, 0, -5);
 
-	t4->position() += VEC3(0, 0, -5);
-	t5->position() += VEC3(3, 0, 0);
-	t2->position() += VEC3(0, 3, 0);
-
+	//t4->position() += VEC3(0, 0, -5);
+	//t5->position() += VEC3(3, 0, 0);
+	//t2->position() += VEC3(0, 3, 0);
+	//t6->position() += VEC3(0, 0, 3);
+	gun_t->rotation() += VEC3(0, 90, 90);
+	gun_t->position() += VEC3(0, 0, -1);
+	//gun_t->scale() = VEC3(0.5, 0.5, 0.5);
 	
 
 	auto cam  = ObjectFactory::create();
@@ -109,14 +119,12 @@ void Window::update() {
 
 
 	scene.addObject(std::move(cam));
-	scene.addObject(std::move(obj4));
+	//scene.addObject(std::move(obj4));
+	scene.addObject(std::move(gun));
 
 
 	queue.submit(scene.renderObjects());
 	
-	//glEnable(GL_DEPTH_TEST);
-	glEnable(GL_CULL_FACE);
-	glCullFace(GL_BACK);
 	while (!glfwWindowShouldClose(m_window_obj))
 	{
 		setCurrentTime();
@@ -124,8 +132,9 @@ void Window::update() {
 
 		glClear(GL_COLOR_BUFFER_BIT);
 
-		t4->rotation() += VEC3(0, 45, 0) * VEC3(0, m_framedata.delta_time, 0);
-		t5->rotation() += VEC3(45, 0, 0) * VEC3(m_framedata.delta_time, 0, 0);
+		//t4->rotation() += VEC3(0, 45, 0) * VEC3(0, m_framedata.delta_time, 0);
+		//t5->rotation() += VEC3(45, 0, 0) * VEC3(m_framedata.delta_time, 0, 0);
+		//t6->rotation() += VEC3(0, 0, 45) * VEC3(0, 0, m_framedata.delta_time);
 		
 
 		scene.update();

@@ -28,7 +28,7 @@ namespace Lefishe {
 
 		void clear();
 
-		UniformInfo getUniform(const STRING& u) const;
+		UniformInfo getUniformInfo(const STRING& u) const;
 		void setUniform(const STRING& u, const void* data) const;
 
 		const std::unordered_map<STRING, UniformInfo>& uniform() const;
@@ -38,7 +38,7 @@ namespace Lefishe {
 
 	private:
 		void create();
-		void retrieveUniforms();
+		void retrieveUniformInfos();
 
 		
 		void getUniformValue(GLint location, GLint size, FLOAT* out_data);

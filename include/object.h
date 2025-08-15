@@ -22,7 +22,7 @@ namespace Lefishe {
 			if(m_components.contains(id)){
 				return std::dynamic_pointer_cast<T>(m_components.at(id));
 			}
-			LOG_WARN("This object ID {0} does not have {1}!", m_id, id.name());
+			LOG_WARN("This object ID {0} does not contain {1}!", m_id, id.name());
 			return nullptr;
 		}
 
@@ -34,7 +34,7 @@ namespace Lefishe {
 			std::type_index id = std::type_index(typeid(T));
 			
 			if(m_components.contains(id)){
-				LOG_WARN("{0} is not concrete class of BaseComponent!", id.name());
+				LOG_WARN("{0} is already existed!", id.name());
 				return nullptr;
 			}else{
 				//LOG_TRACE("Added component of type {0}", id.name());

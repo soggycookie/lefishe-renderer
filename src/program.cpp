@@ -46,7 +46,7 @@ void Program::link(){
        LOG_WARN("[PROGRAM] Compilation failed! \n[INFO] {0}", info_log);
     }
 
-    retrieveUniforms();
+    retrieveUniformInfos();
 }
 
 void Program::bind() const {
@@ -63,13 +63,13 @@ void Program::clear() {
     m_id = 0;
 }
 
-Program::UniformInfo Program::getUniform(const STRING& u) const{
+Program::UniformInfo Program::getUniformInfo(const STRING& u) const{
     return m_uniforms.at(u);
 }
 
 
 void Program::setUniform(const STRING& u, const void* data) const{
-    auto info = getUniform(u);
+    auto info = getUniformInfo(u);
 
     switch(info.type){
         case GL_FLOAT:
@@ -96,7 +96,7 @@ void Program::setUniform(const STRING& u, const void* data) const{
     }
 }
 
-void Program::retrieveUniforms(){
+void Program::retrieveUniformInfos(){
     INT uniform_count = 0;
     glGetProgramiv(m_id, GL_ACTIVE_UNIFORMS, &uniform_count);
 
