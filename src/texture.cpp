@@ -35,7 +35,7 @@ void Texture::samplerMode(){
 }
 
 void Texture::bind(UINT index){
-	glBindTextureUnit(0 , m_id);
+	glBindTextureUnit(index, m_id);
 }
 
 
