@@ -1,15 +1,20 @@
 #include "texture.h"
 
 using namespace Lefishe;
-	
-void Texture::create(TextureInfo info){
-	m_info = info;
 
-	glCreateTextures(static_cast<int>(info.type), 1, &m_id);
+Texture::Texture(TextureInfo info)
+	: m_info(info)
+{
+	create();
+	samplerMode();
+}
+
+void Texture::create(){
+	glCreateTextures(static_cast<int>(m_info.type), 1, &m_id);
 	
-	switch(info.type){
+	switch(m_info.type){
 	case TextureType::TEX_2D:
-		glTextureStorage2D(m_id, info.total_mip_levels, static_cast<int>(info.internal_format), info.width, info.height);
+		glTextureStorage2D(m_id, m_info.total_mip_levels, static_cast<int>(m_info.internal_format), m_info.width, m_info.height);
 	}
 }
 

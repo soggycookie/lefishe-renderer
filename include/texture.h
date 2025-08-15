@@ -51,14 +51,19 @@ namespace Lefishe{
 
 	class Texture{
 	public:
-		Texture() = default;
+		Texture(TextureInfo info);
 		
-		void create(TextureInfo info);
 		void subDataTex2D(UINT mip_level, INT x_offset, INT y_offset, UINT width, UINT height, TexturePixelFormat format, TexturePixelType type, const void* data );
 
 		//void setSamplerData(SamplerMode mode, SamplerValue value);
-		void samplerMode();
 		void bind(UINT index);
+
+		Texture& operator=(const Texture& other) = delete;
+		Texture& operator=(Texture&& other) = delete;
+	private:
+		void create();
+		void samplerMode();
+
 	private:
 
 		UINT m_id     = 0;
