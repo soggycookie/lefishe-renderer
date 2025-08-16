@@ -6,7 +6,7 @@
 
 using namespace Lefishe;
 
- std::shared_ptr<Texture> TextureLoader::load(const STRING& path){
+ std::shared_ptr<Texture> TextureLoader::load(const char* path){
 	INT tex_width  = 0;
 	INT tex_height = 0;
 	INT channels = 0;
@@ -15,7 +15,7 @@ using namespace Lefishe;
 
 	stbi_set_flip_vertically_on_load(true);  
 	LOG_INFO("texture dir : {0} ", path);
-	unsigned char *data = stbi_load(path.c_str(), &tex_width, &tex_height, &channels, 0);
+	unsigned char *data = stbi_load(path, &tex_width, &tex_height, &channels, 0);
 	if (data)
 	{
 		TextureInternalFormat internal_format;

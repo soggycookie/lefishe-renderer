@@ -7,7 +7,7 @@ namespace Lefishe{
 
 class TextureManager{
 public:
-	std::shared_ptr<Texture> createTexture(const STRING& path);
+	std::shared_ptr<Texture> createTexture(const char* path);
 
 	std::shared_ptr<Texture> getTexture(const STRING& path);
 

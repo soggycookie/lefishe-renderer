@@ -109,6 +109,7 @@ namespace Lefishe {
 		std::shared_ptr<const Object> parent() const;
 		std::shared_ptr<const Object> rootParent() const;
 		std::shared_ptr<const TransformComponent> transform() const;
+		std::shared_ptr<TransformComponent> transform();
 
 		void parent(std::weak_ptr<Object> parent);
 		void rootParent(std::weak_ptr<Object> root_parent);

@@ -9,7 +9,7 @@ namespace Lefishe{
 
 	class TextureLoader{
 	public:
-		std::shared_ptr<Texture> load(const STRING& path);
+		std::shared_ptr<Texture> load(const char* path);
 	};
 
 }

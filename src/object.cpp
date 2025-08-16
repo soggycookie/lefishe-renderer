@@ -48,6 +48,10 @@ std::shared_ptr<const TransformComponent> Object::transform() const{
 	return m_transform.lock();
 }
 
+std::shared_ptr<TransformComponent> Object::transform(){
+	return m_transform.lock();
+}
+
 
 bool Object::haveComponent(ComponentID id) const{
 	return m_components.contains(id);

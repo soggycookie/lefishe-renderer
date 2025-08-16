@@ -51,6 +51,17 @@ using namespace Lefishe;
 		MeshData data;
 		bool has_data = true;;
 
+		aiMatrix4x4 node_transform = node->mTransformation;
+		MAT4 rel_mtx(1.0f);
+		std::memcpy(&rel_mtx, &node_transform, sizeof(MAT4));
+		rel_mtx = glm::transpose(rel_mtx);
+
+		//static int c = 1;
+		//LOG_ERROR("{0}", c++);
+
+
+		parent_ptr->transform()->localMtx(rel_mtx);
+
 		for (unsigned int i = 0; i < node->mNumMeshes; i++) {
 			aiMesh* ai_mesh = scene->mMeshes[node->mMeshes[i]];
 
@@ -61,18 +72,6 @@ using namespace Lefishe;
 			data.tangents.resize(ai_mesh->mNumVertices);
 			data.uv.resize(ai_mesh->mNumVertices);
 			data.vertex_colors.resize(ai_mesh->mNumVertices);
-
-			//int texCoordCount = 0;
-			//for (int g = 0; g < AI_MAX_NUMBER_OF_TEXTURECOORDS; g++) {
-			//	if (ai_mesh->mTextureCoords[g] != nullptr) {
-			//		texCoordCount++;
-			//	} else {
-			//		break; 
-			//	}
-			//}
-
-			//LOG_ERROR("Num tex coord {0}", texCoordCount);
-			LOG_ERROR("UV components: {0}", ai_mesh->HasTextureCoords(1));
 
 			for (unsigned int j = 0; j < ai_mesh->mNumVertices; j++) {
 
@@ -127,6 +126,8 @@ using namespace Lefishe;
 				mat_manager->addMaterial(mat);
 			}
 
+			
+
 			auto mesh = parent_ptr->addComponent<MeshComponent>(data);
 			parent_ptr->addComponent<MeshRendererComponent>(mesh, mat);
 
@@ -141,45 +142,46 @@ using namespace Lefishe;
 		for (int i = 0; i < node->mNumChildren; i++) {
 
 			std::shared_ptr<Object> child_ptr = ObjectFactory::create();
+			
 			parent_ptr->addChild(child_ptr);
 			processNode(node->mChildren[i], scene, dir, child_ptr);
 
 		}
 	}
 
-	void AssimpObjectLoader::processMaterial(aiMesh* mesh, const aiScene* scene, const STRING& dir, const std::shared_ptr<Material> obj_material) {
+void AssimpObjectLoader::processMaterial(aiMesh* mesh, const aiScene* scene, const STRING& dir, const std::shared_ptr<Material> obj_material) {
 
-		if(scene->HasMaterials()) {
-			if(mesh->mMaterialIndex >= 0) {
-				aiMaterial* material = scene->mMaterials[mesh->mMaterialIndex];
+	if(scene->HasMaterials()) {
+		if(mesh->mMaterialIndex >= 0) {
+			aiMaterial* material = scene->mMaterials[mesh->mMaterialIndex];
 
-				processTexture(material, scene, aiTextureType_DIFFUSE , dir, obj_material);
-				processTexture(material, scene, aiTextureType_SPECULAR, dir, obj_material);
-				processTexture(material, scene, aiTextureType_AMBIENT , dir, obj_material);
-				processTexture(material, scene, aiTextureType_EMISSIVE, dir, obj_material);
+			processTexture(material, scene, aiTextureType_DIFFUSE , dir, obj_material);
+			processTexture(material, scene, aiTextureType_SPECULAR, dir, obj_material);
+			processTexture(material, scene, aiTextureType_AMBIENT , dir, obj_material);
+			processTexture(material, scene, aiTextureType_EMISSIVE, dir, obj_material);
 
-				processTexture(material, scene, aiTextureType_NORMALS  , dir, obj_material);
-				processTexture(material, scene, aiTextureType_OPACITY  , dir, obj_material);
-				processTexture(material, scene, aiTextureType_SHININESS, dir, obj_material);
+			processTexture(material, scene, aiTextureType_NORMALS  , dir, obj_material);
+			processTexture(material, scene, aiTextureType_OPACITY  , dir, obj_material);
+			processTexture(material, scene, aiTextureType_SHININESS, dir, obj_material);
 
-				processTexture(material, scene, aiTextureType_BASE_COLOR, dir, obj_material);
-				processTexture(material, scene, aiTextureType_METALNESS , dir, obj_material);
-				processTexture(material, scene, aiTextureType_EMISSION_COLOR   , dir, obj_material);
-				processTexture(material, scene, aiTextureType_DIFFUSE_ROUGHNESS, dir, obj_material);
-				processTexture(material, scene, aiTextureType_AMBIENT_OCCLUSION, dir, obj_material);
+			processTexture(material, scene, aiTextureType_BASE_COLOR, dir, obj_material);
+			processTexture(material, scene, aiTextureType_METALNESS , dir, obj_material);
+			processTexture(material, scene, aiTextureType_EMISSION_COLOR   , dir, obj_material);
+			processTexture(material, scene, aiTextureType_DIFFUSE_ROUGHNESS, dir, obj_material);
+			processTexture(material, scene, aiTextureType_AMBIENT_OCCLUSION, dir, obj_material);
 
-				processTexture(material, scene, aiTextureType_UNKNOWN, dir, obj_material);
-
-			}
+			processTexture(material, scene, aiTextureType_UNKNOWN, dir, obj_material);
 
 		}
+
 	}
+}
 
 void AssimpObjectLoader::processTexture(aiMaterial* material, const aiScene* scene, aiTextureType type, const STRING& dir,const std::shared_ptr<Material> obj_material){
 	aiString path;
 
 	if(material->GetTextureCount(type) > 0){
-		LOG_TRACE("Texture type: {0}, count: {1}", textureEnumToString(type), material->GetTextureCount(type));
+		//LOG_TRACE("Texture type: {0}, count: {1}", textureEnumToString(type), material->GetTextureCount(type));
 	}else{
 		return;
 	}
@@ -191,10 +193,13 @@ void AssimpObjectLoader::processTexture(aiMaterial* material, const aiScene* sce
 		if(nullptr == tex) {
 			if(auto tex_manager = m_texture_manager.lock()) {
 				std::shared_ptr<Texture> tex = nullptr;
-				tex = tex_manager->getTexture(dir + "/" + path.C_Str());
 				
+				const STRING rel_path = dir + "/" + path.C_Str(); 
+				tex = tex_manager->getTexture(rel_path.c_str());
+				
+
 				if(nullptr == tex){
-					tex = tex_manager->createTexture(dir + "/" + path.C_Str());
+					tex = tex_manager->createTexture(rel_path.c_str());
 				}
 
 				assignTextureToMaterial(type, tex, obj_material);
