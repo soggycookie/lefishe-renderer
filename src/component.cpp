@@ -35,6 +35,13 @@ TransformComponent::TransformComponent( std::shared_ptr<Object> owner, Transform
 	//update();
 }
 
+TransformComponent& TransformComponent::operator=(const TransformComponent& other){
+	is_dirty = true;
+	m_data = other.m_data;
+
+	return *this;
+}
+
 const VEC3& TransformComponent::position() const {
 	return m_data.m_position;	
 }
@@ -206,7 +213,14 @@ std::type_index TransformComponent::getType() const {
 CameraComponent::CameraComponent(std::shared_ptr<Object> owner, CameraInfo info)
 	: BaseComponent(owner), m_camera_info(info)
 {
-	update();
+	//update();
+}
+
+CameraComponent& CameraComponent::operator=(const CameraComponent& other){
+	is_dirty = true;
+	m_camera_info = other.m_camera_info;
+
+	return *this;
 }
 
 std::shared_ptr<CameraComponent> CameraComponent::m_main_cam = nullptr;
@@ -335,6 +349,10 @@ MeshComponent::MeshComponent(std::shared_ptr<Object> owner, const MeshData& data
 MeshComponent::MeshComponent(std::shared_ptr<Object> owner, MeshData&& data)
 	: BaseComponent(owner), m_data(std::move(data))
 {
+}
+
+MeshComponent& MeshComponent::operator=(const MeshComponent& other){
+	m_data = other.m_data;
 }
 
 const std::vector<VEC3>& MeshComponent::vertices() const{
@@ -512,6 +530,10 @@ MeshRendererComponent::MeshRendererComponent(std::shared_ptr<Object> owner, std:
 {	
 }
 
+MeshRendererComponent& MeshRendererComponent::operator=(const MeshRendererComponent& other){
+	m_material = other.m_material;
+	m_mesh = m_owner.lock()->getComponent<MeshComponent>();
+}
 
 void MeshRendererComponent::material(std::shared_ptr<Material> material){
 	m_material = material; 

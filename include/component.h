@@ -16,7 +16,8 @@ namespace Lefishe {
 		virtual void update() = 0;
 
 		std::shared_ptr<Object> owner();
-
+		
+		BaseComponent& operator=(BaseComponent&& other) = delete;
 
 		long id() const;
 
@@ -34,6 +35,8 @@ namespace Lefishe {
 	class TransformComponent : public BaseComponent {
 	public:
 		TransformComponent(std::shared_ptr<Object> owner, TransformData data = TransformData{});
+
+		TransformComponent& operator=(const TransformComponent& other);
 
 		const VEC3& position() const;
 		const VEC3& rotation() const;
@@ -106,6 +109,7 @@ namespace Lefishe {
 	public:
 		CameraComponent( std::shared_ptr<Object> owner, CameraInfo info = CameraInfo{});
 
+		CameraComponent& operator=(const CameraComponent& other);
 
 		static std::shared_ptr<CameraComponent> main();
 		static void main(std::shared_ptr<CameraComponent> main);
@@ -161,6 +165,8 @@ namespace Lefishe {
 		MeshComponent(std::shared_ptr<Object> owner);
 		MeshComponent(std::shared_ptr<Object> owner, MeshData&& data);
 		MeshComponent(std::shared_ptr<Object> owner, const MeshData& data);
+
+		MeshComponent& operator=(const MeshComponent& other);
 
 		const std::vector<VEC3>& vertices() const;
 		const std::vector<VEC2>& uv() const;
@@ -226,6 +232,8 @@ namespace Lefishe {
 	public:
 		MeshRendererComponent(std::shared_ptr<Object> owner, std::shared_ptr<MeshComponent> mesh = nullptr, std::shared_ptr<Material> material = nullptr);
 		
+		MeshRendererComponent& operator=(const MeshRendererComponent& other);
+
 		void material(std::shared_ptr<Material> material);
 		std::shared_ptr<Material> material();
 
