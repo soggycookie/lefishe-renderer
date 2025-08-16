@@ -4,6 +4,8 @@
 #include <glm/gtc/type_ptr.hpp>
 #include <glm/gtc/quaternion.hpp>
 #include <glm/gtx/string_cast.hpp>
+#include <glm/gtx/matrix_decompose.hpp>
+#include <glm/gtx/euler_angles.hpp>
 
 #include "component.h"
 #include "object.h"
@@ -43,30 +45,30 @@ TransformComponent& TransformComponent::operator=(const TransformComponent& othe
 }
 
 const VEC3& TransformComponent::position() const {
-	return m_data.m_position;	
+	return m_data.position;	
 }
 
 const VEC3& TransformComponent::rotation() const {
-	return m_data.m_rotation;
+	return m_data.rotation;
 }
 
 const VEC3& TransformComponent::scale() const{
-	return m_data.m_scale;
+	return m_data.scale;
 }
 
 VEC3& TransformComponent::position() {
 	is_dirty = true;
-	return m_data.m_position;
+	return m_data.position;
 }
 
 VEC3& TransformComponent::rotation() {
 	is_dirty = true;
-	return m_data.m_rotation;
+	return m_data.rotation;
 }
 
 VEC3& TransformComponent::scale(){
 	is_dirty = true;
-	return m_data.m_scale;
+	return m_data.scale;
 }
 
 const VEC3& TransformComponent::right() const {
@@ -103,14 +105,39 @@ const MAT4& TransformComponent::globalMtx() const{
 }
 
 void TransformComponent::localMtx(const MAT4& mtx){
-	is_dirty = true;
 	m_local_mtx = mtx;
+	glm::quat rotation;
+	glm::vec3 skew;
+	glm::vec4 perspective;
+	glm::decompose(mtx, m_data.scale, rotation, m_data.position, skew, perspective);
+	rotation = glm::conjugate(rotation);
+
+	m_data.rotation = glm::degrees(glm::eulerAngles(rotation));
+	
+	auto owner = m_owner.lock();
+	auto parent = owner->parent();
+
+	if(parent != nullptr) {
+		auto pt = parent->transform();
+		m_global_mtx = pt->globalMtx() * m_local_mtx;
+	}
+	else {
+		m_global_mtx = m_local_mtx;
+	}
+	owner->onTransformChanged();
+	
+
+
+	m_local_to_world_mtx = m_global_mtx ;
+	m_world_to_local_mtx = glm::inverse(m_local_to_world_mtx);
+
+	is_dirty = false;
 }
 
-void TransformComponent::globalMtx(const MAT4& mtx){
-	is_dirty = true;
-	m_global_mtx = mtx;
-}
+//void TransformComponent::globalMtx(const MAT4& mtx){
+//	//is_dirty = true;
+//	m_global_mtx = mtx;
+//}
 
 void TransformComponent::markDirty(){
 	is_dirty = true;
@@ -121,22 +148,22 @@ void TransformComponent::constructMatrix() {
 		return;
 	}
 
-	if(m_data.m_rotation.x >= 360){
-		m_data.m_rotation.x = m_data.m_rotation.x - 360;
+	if(m_data.rotation.x >= 360){
+		m_data.rotation.x = m_data.rotation.x - 360;
 	}
 
-	if(m_data.m_rotation.y >= 360){
-		m_data.m_rotation.y = m_data.m_rotation.y - 360;
+	if(m_data.rotation.y >= 360){
+		m_data.rotation.y = m_data.rotation.y - 360;
 	}
 
-	if(m_data.m_rotation.z >= 360){
-		m_data.m_rotation.z = m_data.m_rotation.z - 360;
+	if(m_data.rotation.z >= 360){
+		m_data.rotation.z = m_data.rotation.z - 360;
 	}
 
 
-	float cx = glm::cos(glm::radians(m_data.m_rotation.x)), sx = glm::sin(glm::radians(m_data.m_rotation.x));
-	float cy = glm::cos(glm::radians(m_data.m_rotation.y)), sy = glm::sin(glm::radians(m_data.m_rotation.y));
-	float cz = glm::cos(glm::radians(m_data.m_rotation.z)), sz = glm::sin(glm::radians(m_data.m_rotation.z));
+	float cx = glm::cos(glm::radians(m_data.rotation.x)), sx = glm::sin(glm::radians(m_data.rotation.x));
+	float cy = glm::cos(glm::radians(m_data.rotation.y)), sy = glm::sin(glm::radians(m_data.rotation.y));
+	float cz = glm::cos(glm::radians(m_data.rotation.z)), sz = glm::sin(glm::radians(m_data.rotation.z));
 
 	//Z * Y * X order -> X -> Y -> Z
 	//TODO: support quaternion
@@ -169,24 +196,24 @@ void TransformComponent::constructMatrix() {
 	m_up = m_rot_mtx[1];
 	m_forward = m_rot_mtx[2];
 
-	glm::mat4 translation = glm::translate(glm::mat4(1.0f), m_data.m_position);
-	glm::mat4 scale = glm::scale(glm::mat4(1.0f), m_data.m_scale);
+	glm::mat4 translation = glm::translate(glm::mat4(1.0f), m_data.position);
+	glm::mat4 scale = glm::scale(glm::mat4(1.0f), m_data.scale);
 
 	m_local_mtx = translation * m_rot_mtx * scale;
 	
 
-	if(auto owner = m_owner.lock()){
-		auto parent = owner->parent();
+	auto owner = m_owner.lock();
+	auto parent = owner->parent();
 
-		if(parent != nullptr){
-			auto pt = parent->transform();
-			m_global_mtx = pt->globalMtx() * m_local_mtx;
-			
-		}else{
-			m_global_mtx = m_local_mtx;		
-		}
-		owner->onTransformChanged();
+	if(parent != nullptr) {
+		auto pt = parent->transform();
+		m_global_mtx = pt->globalMtx() * m_local_mtx;
 	}
+	else {
+		m_global_mtx = m_local_mtx;
+	}
+	owner->onTransformChanged();
+	
 
 
 	m_local_to_world_mtx = m_global_mtx ;
@@ -353,6 +380,8 @@ MeshComponent::MeshComponent(std::shared_ptr<Object> owner, MeshData&& data)
 
 MeshComponent& MeshComponent::operator=(const MeshComponent& other){
 	m_data = other.m_data;
+
+	return *this;
 }
 
 const std::vector<VEC3>& MeshComponent::vertices() const{
@@ -533,6 +562,8 @@ MeshRendererComponent::MeshRendererComponent(std::shared_ptr<Object> owner, std:
 MeshRendererComponent& MeshRendererComponent::operator=(const MeshRendererComponent& other){
 	m_material = other.m_material;
 	m_mesh = m_owner.lock()->getComponent<MeshComponent>();
+
+	return *this;
 }
 
 void MeshRendererComponent::material(std::shared_ptr<Material> material){

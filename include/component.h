@@ -27,9 +27,9 @@ namespace Lefishe {
 	};
 
 	struct TransformData{
-		VEC3 m_position = glm::vec3(0.0f);
-		VEC3 m_rotation = glm::vec3(0.0f);
-		VEC3 m_scale	= glm::vec3(1.0f);
+		VEC3 position = glm::vec3(0.0f);
+		VEC3 rotation = glm::vec3(0.0f);
+		VEC3 scale	  = glm::vec3(1.0f);
 	};
 
 	class TransformComponent : public BaseComponent {
@@ -58,7 +58,7 @@ namespace Lefishe {
 		const MAT4& globalMtx() const;
 
 		void localMtx(const MAT4& mtx);
-		void globalMtx(const MAT4& mtx);
+		//void globalMtx(const MAT4& mtx);
 
 		void markDirty();
 
@@ -136,6 +136,7 @@ namespace Lefishe {
 	private:
 		void constructMatrix();
 		void check();
+
 
 	private:
 		static std::shared_ptr<CameraComponent> m_main_cam;
