@@ -1,5 +1,6 @@
 #pragma once
 #include "global_header.h"
+#include "texture.h"
 
 namespace Lefishe{
 
@@ -12,15 +13,19 @@ namespace Lefishe{
 		void attachColor();
 		void attachDepth(bool use_stencil);
 		void finalize();
-		void bind();
+		void bind() const;
+
+		std::shared_ptr<Texture2D> colorMap() const;
+		std::shared_ptr<Texture2D> depthMap() const;
+
 	private:
 		void create();
 		void release();
 
 	private:
 		UINT m_fbo;
-		UINT m_color_rbo;
-		UINT m_depth_rbo;
+		std::shared_ptr<Texture2D> m_color;
+		std::shared_ptr<Texture2D> m_depth;
 
 		UINT m_viewport_width = 0;
 		UINT m_viewport_height = 0;
