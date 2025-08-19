@@ -4,7 +4,7 @@
 using namespace Lefishe;
 
 
-std::shared_ptr<Texture> TextureManager::createTexture(const char* path){
+std::shared_ptr<Texture2D> TextureManager::createTexture(const char* path){
 	if(m_textures.contains(path)){
 		LOG_INFO("Texture at {0} already created!\n", path);
 		return nullptr;
@@ -21,7 +21,7 @@ std::shared_ptr<Texture> TextureManager::createTexture(const char* path){
 	return tex;
 }
 
-std::shared_ptr<Texture> TextureManager::getTexture(const STRING& path){
+std::shared_ptr<Texture2D> TextureManager::getTexture(const STRING& path){
 	if(!m_textures.contains(path)){
 		return nullptr;
 	}

@@ -6,7 +6,7 @@ using namespace Lefishe;
 
 UINT DrawCall::m_current_id = 0;
 
-DrawCall::DrawCall(Buffer vertex, Buffer indices, std::shared_ptr<MeshRendererComponent> mesh_renderer,  SIZE_T indirect_offset)
+DrawCall::DrawCall(Buffer vertex, Buffer indices, MeshRendererComponent& mesh_renderer,  SIZE_T indirect_offset)
 	: m_vertex_buffer(vertex), m_index_buffer(indices), m_mesh_renderer(mesh_renderer), m_indirect_offset(indirect_offset)
 {
 	setup();
@@ -16,24 +16,22 @@ DrawCall::DrawCall(Buffer vertex, Buffer indices, std::shared_ptr<MeshRendererCo
 
 void DrawCall::bind() const
 {
-	if(auto renderer = m_mesh_renderer.lock()){
-		std::shared_ptr<Object> owner = renderer->owner();
-		
-		renderer->material()->setUniformData("model", sizeof(MAT4), &(owner->transform()->localToWorldMtx()));
-		//int a[2] = {1, 1};
-		//renderer->material()->setUniformData("here", sizeof(INT) * 2, a);
-	}
 
+	std::shared_ptr<Object> owner = m_mesh_renderer.owner();
 
+	m_mesh_renderer.material()->setUniformData("model", sizeof(MAT4), &(owner->transform()->localToWorldMtx()));
 
-	if(auto mesh_renderer = m_mesh_renderer.lock()){
-		mesh_renderer->material()->bindAndSetUniform();
-	}
+	m_mesh_renderer.material()->bindAndSetUniform();
+	
 
 	m_current_id = m_vao_id;
 
 	glBindVertexArray(m_vao_id);
 
+}
+
+void DrawCall::cleanUpBinding() const {
+	m_mesh_renderer.material()->cleanUpBinding();
 }
 
 SIZE_T DrawCall::indirectOffset() const{
@@ -65,14 +63,25 @@ void DrawCall::setup(){
     const GLsizei color_stride = 4 * sizeof(GLfloat); // 16 bytes (4 floats for color)
     const GLsizei uv_stride = 2 * sizeof(GLfloat); // 8 bytes (2 floats for UV)
 	
-	if(auto mesh = m_mesh_renderer.lock()->mesh()){
+	if(auto mesh = m_mesh_renderer.mesh()){
+		//glVertexArrayVertexBuffer(m_vao_id, 0, m_vertex_buffer.id(), mesh->vertexByteOffset(), pos_stride); 
+		//glVertexArrayVertexBuffer(m_vao_id, 0, m_vertex_buffer.id(), mesh->normalByteOffset(), normal_stride); 
+		//glVertexArrayVertexBuffer(m_vao_id, 0, m_vertex_buffer.id(), mesh->tangentByteOffset(), tangent_stride); 
+		//glVertexArrayVertexBuffer(m_vao_id, 0, m_vertex_buffer.id(), mesh->vertexColorByteOffset(), color_stride); 
+		//glVertexArrayVertexBuffer(m_vao_id, 0, m_vertex_buffer.id(), mesh->uvByteOffset(), uv_stride); 
+		
+		//glVertexArrayAttribFormat(m_vao_id, 0 , 3, GL_FLOAT, GL_FALSE, mesh->vertexByteOffset());
+		//glVertexArrayAttribFormat(m_vao_id, 1 , 3, GL_FLOAT, GL_FALSE, mesh->normalByteOffset());
+		//glVertexArrayAttribFormat(m_vao_id, 2 , 3, GL_FLOAT, GL_FALSE, mesh->tangentByteOffset());
+		//glVertexArrayAttribFormat(m_vao_id, 3 , 4, GL_FLOAT, GL_FALSE, mesh->vertexColorByteOffset());
+		//glVertexArrayAttribFormat(m_vao_id, 4 , 2, GL_FLOAT, GL_FALSE, mesh->uvByteOffset());
+
 		glVertexArrayVertexBuffer(m_vao_id, 0, m_vertex_buffer.id(), mesh->vertexByteOffset(), pos_stride); // Positions
 		glVertexArrayVertexBuffer(m_vao_id, 1, m_vertex_buffer.id(), mesh->normalByteOffset(), normal_stride); // Normals
 		glVertexArrayVertexBuffer(m_vao_id, 2, m_vertex_buffer.id(), mesh->tangentByteOffset(), tangent_stride); // Tangents
 		glVertexArrayVertexBuffer(m_vao_id, 3, m_vertex_buffer.id(), mesh->vertexColorByteOffset(), color_stride); // Colors
-		glVertexArrayVertexBuffer(m_vao_id, 4, m_vertex_buffer.id(), mesh->uvByteOffset(), uv_stride); // UVs
-		
-		
+		glVertexArrayVertexBuffer(m_vao_id, 4, m_vertex_buffer.id(), mesh->uvByteOffset(), uv_stride); 
+
 		glVertexArrayElementBuffer(m_vao_id, m_index_buffer.id());
 	
 
@@ -87,11 +96,11 @@ void DrawCall::setup(){
 		//uv
 		glEnableVertexArrayAttrib(m_vao_id, 4);
 
-		glVertexArrayAttribFormat(m_vao_id, 0 , 3, GL_FLOAT, GL_FALSE, mesh->vertexByteOffset());
-		glVertexArrayAttribFormat(m_vao_id, 1 , 3, GL_FLOAT, GL_FALSE, mesh->normalByteOffset());
-		glVertexArrayAttribFormat(m_vao_id, 2 , 3, GL_FLOAT, GL_FALSE, mesh->tangentByteOffset());
-		glVertexArrayAttribFormat(m_vao_id, 3 , 4, GL_FLOAT, GL_FALSE, mesh->vertexColorByteOffset());
-		glVertexArrayAttribFormat(m_vao_id, 4 , 2, GL_FLOAT, GL_FALSE, mesh->uvByteOffset());
+		glVertexArrayAttribFormat(m_vao_id, 0 , 3, GL_FLOAT, GL_FALSE, 0);
+		glVertexArrayAttribFormat(m_vao_id, 1 , 3, GL_FLOAT, GL_FALSE, 0);
+		glVertexArrayAttribFormat(m_vao_id, 2 , 3, GL_FLOAT, GL_FALSE, 0);
+		glVertexArrayAttribFormat(m_vao_id, 3 , 4, GL_FLOAT, GL_FALSE, 0);
+		glVertexArrayAttribFormat(m_vao_id, 4 , 2, GL_FLOAT, GL_FALSE, 0);
 	
 		glVertexArrayAttribBinding(m_vao_id, 0, 0); 
 		glVertexArrayAttribBinding(m_vao_id, 1, 1); 

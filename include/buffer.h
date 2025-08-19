@@ -35,7 +35,7 @@ namespace Lefishe{
 		UINT id() const;
 		UINT size() const;
 
-		void clear();
+		void release();
 	private:
 
 	private:

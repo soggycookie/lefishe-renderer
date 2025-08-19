@@ -5,11 +5,11 @@
 #include "global_header.h"
 
 namespace Lefishe{
-	class Texture;
+	class Texture2D;
 
 	class TextureLoader{
 	public:
-		std::shared_ptr<Texture> load(const char* path);
+		std::shared_ptr<Texture2D> load(const char* path);
 	};
 
 }

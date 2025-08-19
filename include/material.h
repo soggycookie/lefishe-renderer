@@ -53,21 +53,20 @@ namespace Lefishe{
 	};
 
 	struct MaterialSettings{
-		bool enable_depth = true;
 		bool depth_written = true;
 		DepthFunc depth_func = DepthFunc::LESS;
 
-		bool is_cull = true;
+		bool is_cull = false;
 		CullMode cull_mode = CullMode::BACK;
 
 		PolygonMode polygon_mode = PolygonMode::FILL;
 
 		GeometryType geo_type = GeometryType::OPAQUE_GEO;
 		
-		//bool enable_blend = false;
-		//BlendFunc src_factor = BlendFunc::SRC_ALPHA;
-		//BlendFunc dst_factor = BlendFunc::ONE_MINUS_SRC_ALPHA;
-		//BlendOp blend_op = BlendOp::ADD;
+		bool enable_blend = true;
+		BlendFunc src_factor = BlendFunc::SRC_ALPHA;
+		BlendFunc dst_factor = BlendFunc::ONE_MINUS_SRC_ALPHA;
+		BlendOp blend_op = BlendOp::ADD;
 		//
 		//float alpha_cutoff = 0.0f;
 	};
@@ -86,10 +85,11 @@ namespace Lefishe{
 		const std::shared_ptr<Program> program() const;
 
 		void bindAndSetUniform() const;
+		void cleanUpBinding() const;
 
 		void setUniformData(const STRING& name, SIZE_T size, const void* data);
 
-		INT  getTextureSlot(const STRING& name, INT count = 1) const;
+		INT  getTextureSlot(const STRING& name) const;
 		
 		void assignTexture(const STRING& name, std::shared_ptr<Texture> texture);
 
@@ -103,8 +103,8 @@ namespace Lefishe{
 		UINT m_id = 0;
 		std::weak_ptr<Program> m_program;
 		std::unordered_map<STRING, void*> m_uniform_data;
-		std::unordered_map<STRING, std::vector<std::weak_ptr<Texture>>> m_textures;
-		std::unordered_map<STRING, INT*> m_texture_slots;
+		std::unordered_map<STRING, std::weak_ptr<Texture>> m_textures;
+		std::unordered_map<STRING, INT> m_texture_slots;
 		MaterialSettings m_material_settings;
 	};
 

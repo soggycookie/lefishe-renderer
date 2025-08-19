@@ -2,8 +2,8 @@
 
 using namespace Lefishe;
 
-MaterialManager::MaterialManager(const std::shared_ptr<ProgramManager>& program_manager)
-	: m_program_manager(program_manager)
+MaterialManager::MaterialManager(const std::shared_ptr<ProgramManager>& program_manager, const std::shared_ptr<TextureManager>& texture_manager)
+	: m_program_manager(program_manager), m_texture_manager(texture_manager)
 {
 }
 
@@ -27,7 +27,9 @@ std::shared_ptr<Material> MaterialManager::defaultMaterial(){
 			);
 		}
 		
-		return std::make_shared<Material>(p->getProgram(DEFAULT_PROGRAM));
+		auto material = std::make_shared<Material>(p->getProgram(DEFAULT_PROGRAM));
+		material->assignTexture("diffuseMap", m_texture_manager.lock()->getTexture(DEFAULT_DIFFUSE_PATH));
+		return material;
 	}
 
 	return nullptr;

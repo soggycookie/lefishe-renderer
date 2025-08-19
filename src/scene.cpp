@@ -17,15 +17,16 @@ void Scene::fetch(const std::shared_ptr<Object>& obj){
 
 	if(obj->haveComponent<MeshRendererComponent>())
 	{
-		m_render_objs.insert({obj->id(), obj});	
+		m_render_objs.insert({obj->id(), obj->getComponent<MeshRendererComponent>()});	
 	}
 
 	if(obj->haveComponent<CameraComponent>())
 	{
-		m_camera_objs.insert({obj->id(), obj});
 
 		auto c = obj->getComponent<CameraComponent>();
 		auto t = obj->getComponent<TransformComponent>();
+		
+		m_camera_objs.insert({obj->id(), c});
 		
 		if(CameraComponent::main() ==  c){
 			m_cam = obj;
@@ -46,11 +47,19 @@ void Scene::fetch(const std::shared_ptr<Object>& obj){
 
 }
 
-const std::unordered_map<ObjectID, std::shared_ptr<Object>>& Scene::renderObjects() const{
+const std::unordered_map<ObjectID, std::weak_ptr<MeshRendererComponent>>& Scene::renderObjects() const{
 	return m_render_objs;
 }
 
-const std::unordered_map<ObjectID, std::shared_ptr<Object>>& Scene::cameraObjects() const{
+const std::unordered_map<ObjectID, std::weak_ptr<CameraComponent>>& Scene::cameraObjects() const{
+	return m_camera_objs;
+}
+
+std::unordered_map<ObjectID, std::weak_ptr<MeshRendererComponent>>& Scene::renderObjects() {
+	return m_render_objs;
+}
+
+std::unordered_map<ObjectID, std::weak_ptr<CameraComponent>>& Scene::cameraObjects() {
 	return m_camera_objs;
 }
 

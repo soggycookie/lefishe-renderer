@@ -20,6 +20,7 @@
 #include <cmath>
 #include <stack>
 #include <list>
+#include <algorithm>
 #include <thread>
 #include <mutex>
 #include <functional>

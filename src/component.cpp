@@ -9,7 +9,7 @@
 
 #include "component.h"
 #include "object.h"
-
+#include "draw_call.h"
 
 using namespace Lefishe;
 
@@ -238,9 +238,15 @@ std::type_index TransformComponent::getType() const {
 //Camera Component
 
 CameraComponent::CameraComponent(std::shared_ptr<Object> owner, CameraInfo info)
-	: BaseComponent(owner), m_camera_info(info)
+	: BaseComponent(owner), m_camera_info(info), m_fbo(info.pixel_width, info.pixel_height)
 {
 	//update();
+	m_fbo.attachColor();
+	if(info.enable_depth){
+		m_fbo.attachDepth(false);
+	}
+
+	m_fbo.finalize();
 }
 
 CameraComponent& CameraComponent::operator=(const CameraComponent& other){
@@ -339,6 +345,23 @@ void CameraComponent::constructMatrix(){
 //const Component CameraComponent::id() const{
 //	return Component::CAMERA;
 //}
+
+std::shared_ptr<Texture2D> CameraComponent::colorTexture() const{
+	return m_fbo.colorMap();
+}
+
+void CameraComponent::startRender() const{
+	m_fbo.bind();
+
+	if(m_camera_info.enable_depth){
+		glClearDepth(1.0);             
+		glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);   
+		
+		glEnable(GL_DEPTH_TEST);
+	}else{
+		glClear(GL_COLOR_BUFFER_BIT);   
+	}	
+}
 
 std::type_index CameraComponent::getType() const {
 	return std::type_index(typeid(CameraComponent));
@@ -574,6 +597,18 @@ std::shared_ptr<Material> MeshRendererComponent::material(){
 	return m_material.lock();
 }
 
+void MeshRendererComponent::drawcall(std::shared_ptr<DrawCall> drawcall){
+	m_drawcall = drawcall;
+}
+
+
+std::shared_ptr<DrawCall> MeshRendererComponent::drawcall() const{
+	return m_drawcall;
+}
+
+bool MeshRendererComponent::hasDrawcall() const{
+	return nullptr != m_drawcall;
+}
 
 std::type_index MeshRendererComponent::getType() const{
 	return std::type_index(typeid(MeshRendererComponent));

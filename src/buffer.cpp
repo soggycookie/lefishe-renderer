@@ -31,6 +31,8 @@ void Buffer::create(UINT total_size, const void* data){
 		return;
 	}
 
+	m_size = total_size;
+
 	glCreateBuffers(1, &m_id);
 
 
@@ -40,7 +42,7 @@ void Buffer::create(UINT total_size, const void* data){
 	glNamedBufferStorage(m_id, total_size, data, GL_DYNAMIC_STORAGE_BIT);
 }
 
-void Buffer::clear(){
+void Buffer::release(){
 	glDeleteBuffers(1, &m_id);
 	m_id = 0;
 }

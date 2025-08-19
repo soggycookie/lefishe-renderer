@@ -2,7 +2,8 @@
 #include "global_header.h"
 #include "program.h"
 
-#define DEFAULT_PROGRAM "COMMON"
+#define DEFAULT_PROGRAM "common"
+#define SCREEN_SPACE_PROGRAM "ssquad"
 
 namespace Lefishe{
 

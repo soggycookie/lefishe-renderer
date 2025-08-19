@@ -39,14 +39,19 @@ in vec4 VertexColor;
 in vec3 normal;
 in vec3 tangent;
 
-uniform int here[2] = int[](2, 1);
 
-//layout(binding = 1) uniform sampler2D tex[2];
+
+layout(binding = 0) uniform sampler2D diffuseMap;
+// layout(binding = 1) uniform sampler2D normalMap;
+// layout(binding = 2) uniform sampler2D metallicMap;
+
 // layout(binding = 1) uniform sampler2D arr[3];
+
+vec4 color = vec4(1.0);
 
 void main()
 {
-	// vec4 col = texture(tex[0], TexCoord);
-	// vec4 col2 = texture(tex[1], TexCoord);
-	FragColor = pow(vec4(TexCoord, here[0] - here[1], 1.0), vec4(1/2.2)) ;
+	//vec4 col = texture(diffuseMap, TexCoord) * texture(normalMap, TexCoord) * texture(metallicMap, TexCoord);
+
+	FragColor = vec4(texture(diffuseMap, TexCoord).xyz, 1) ;
 }

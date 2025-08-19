@@ -5,6 +5,8 @@
 #include "draw_call.h"
 #include "object.h"
 
+#include "screen_space_quad.h"
+
 namespace Lefishe {
 
 	struct RendererConfig {
@@ -13,10 +15,12 @@ namespace Lefishe {
 
 	class Renderer {
 	public:
-		void draw(const std::vector<DrawCall>& drawcalls);
+		Renderer();
+		void draw(DrawCall& drawcall);
 
 
 	private:
+		//ScreenSpaceQuad m_quad;
 
 	};
 

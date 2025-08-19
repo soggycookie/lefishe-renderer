@@ -2,6 +2,7 @@
 #include "global_header.h"
 #include "material.h"
 #include "id_generator.h"
+#include "framebuffer.h"
 
 namespace Lefishe {
 	class Object;
@@ -102,7 +103,7 @@ namespace Lefishe {
 			FLOAT aspect = 16.0f / 9.0f;
 			FLOAT pixel_width = 1280;
 			FLOAT pixel_height = 720;
-
+			bool enable_depth = true;
 		};
 
 	class CameraComponent : public BaseComponent {
@@ -128,6 +129,8 @@ namespace Lefishe {
 		const FLOAT& farPlane() const;
 		FLOAT& farPlane();
 
+		std::shared_ptr<Texture2D> colorTexture() const;
+		void startRender() const;
 
 		std::type_index getType() const override;
 		//const Component id() const override;
@@ -143,6 +146,8 @@ namespace Lefishe {
 
 		MAT4 m_perspective_mtx = glm::mat4(1.0f);
 		CameraInfo m_camera_info;
+		Framebuffer m_fbo;
+
 		bool is_dirty = true;
 	};
 
@@ -228,6 +233,7 @@ namespace Lefishe {
 
 	};
 
+	class DrawCall;
 
 	class MeshRendererComponent : public BaseComponent{
 	public:
@@ -240,12 +246,17 @@ namespace Lefishe {
 
 		std::shared_ptr<MeshComponent> mesh();
 
+		void drawcall(std::shared_ptr<DrawCall> drawcall);
+		std::shared_ptr<DrawCall> drawcall() const;
+		bool hasDrawcall() const;
+
 		std::type_index getType() const override;
 		void update() override;
 
 	private:
 		std::weak_ptr<MeshComponent> m_mesh;
 		std::weak_ptr<Material> m_material;
+		std::shared_ptr<DrawCall> m_drawcall;
 	};
 
 }

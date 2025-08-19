@@ -14,6 +14,9 @@ namespace Lefishe{
 		RGB_32F = GL_RGB32F,
 		RGBA_16F = GL_RGBA16F,
 		RGBA_32F = GL_RGBA32F,
+
+		DEPTH24_STENCIL8 = GL_DEPTH24_STENCIL8,
+		DEPTH24 = GL_DEPTH_COMPONENT24
 	};
 
 	enum class TexturePixelFormat{
@@ -28,12 +31,13 @@ namespace Lefishe{
 		UBYTE = GL_UNSIGNED_BYTE
 	};
 
-	struct TextureInfo{
-		TextureType type = TextureType::TEX_2D;
+	struct Texture2DInfo{
 		TextureInternalFormat internal_format = TextureInternalFormat::RGBA8;
 		UINT width  = 0;
 		UINT height = 0;
 		UINT total_mip_levels = 1;
+
+		bool operator==(const Texture2DInfo&) const = default;
 	};
 
 	enum class SamplerMode{
@@ -48,26 +52,52 @@ namespace Lefishe{
 		LINEAR  = GL_LINEAR
 	};
 
-
 	class Texture{
 	public:
-		Texture(TextureInfo info);
+		void bind(UINT index) const;
+
+		static inline void unbind(UINT binding_index){
+			glBindTextureUnit(binding_index, 0);
+		}
+
+		UINT id() const;
+	private:
+		virtual void create() = 0;
+
+	protected:
+		UINT m_tex_id = 0;
+	};
+
+	
+	//class RenderTexture : public Texture{
+	//public:
+	//	RenderTexture() = default;
+	//	RenderTexture(Texture2DInfo info);
+
+	//	void create(Texture2DInfo info);
+
+	//private:
+	//	void create() override;
+	//	
+	//private:
+	//	Texture2DInfo m_info;
+	//};
+
+	
+	class Texture2D : public Texture{
+	public:
+		Texture2D(Texture2DInfo info);
 		
 		void subDataTex2D(UINT mip_level, INT x_offset, INT y_offset, UINT width, UINT height, TexturePixelFormat format, TexturePixelType type, const void* data );
 
-		//void setSamplerData(SamplerMode mode, SamplerValue value);
-		void bind(UINT index);
-
-		Texture& operator=(const Texture& other) = delete;
-		Texture& operator=(Texture&& other) = delete;
+		Texture2D& operator=(const Texture2D& other) = delete;
+		Texture2D& operator=(Texture2D&& other) = delete;
 	private:
-		void create();
+		void create() override;
 		void samplerMode();
 
 	private:
-
-		UINT m_id     = 0;
-		TextureInfo m_info;
+		Texture2DInfo m_info;
 	};
 
 	//class TextureManager;

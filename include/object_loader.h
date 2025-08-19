@@ -36,7 +36,7 @@ namespace Lefishe{
 		void processMaterial(aiMesh* mesh, const aiScene* scene, const STRING& dir, const std::shared_ptr<Material> obj_material);
 		void processTexture(aiMaterial* material, const aiScene* scene, aiTextureType type, const STRING& dir, const std::shared_ptr<Material> obj_material);
 		STRING textureEnumToString(aiTextureType type);
-		void assignTextureToMaterial(aiTextureType type, const std::shared_ptr<Texture>& texture, const std::shared_ptr<Material>& obj_material);
+		void assignTextureToMaterial(aiTextureType type, const std::shared_ptr<Texture2D>& texture, const std::shared_ptr<Material>& obj_material);
 
 	private:
 

@@ -22,11 +22,9 @@ void Material::bindAndSetUniform() const{
         bindSettings();
     	p->bind();
 
-        for(const auto& [key, textures] : m_textures){
-            for(int i =0 ;i < textures.size() ;i++){
-                if(auto tex = textures[i].lock()){
-                    tex->bind(getTextureSlot(key, i + 1));
-                }
+        for(const auto& [key, texture] : m_textures){
+			if(!texture.expired()){
+                texture.lock()->bind(getTextureSlot(key));
             }
         }
 
@@ -34,6 +32,12 @@ void Material::bindAndSetUniform() const{
 		    p->setUniform(key, value);
 	    }
     }
+}
+
+void Material::cleanUpBinding() const {
+	for(const auto& [key, textures] : m_textures) {
+		Texture::unbind(getTextureSlot(key));
+	}
 }
 
 void Material::setUniformData(const STRING& name, SIZE_T size, const void* data){
@@ -52,22 +56,12 @@ Material::~Material(){
     }  
 }
 
-INT Material::getTextureSlot(const STRING& name, INT count) const{
+INT Material::getTextureSlot(const STRING& name) const{
     if(!m_texture_slots.contains(name)){
-        return -1;
+        return 0;
     }
     
-    auto p = program();
-    auto pair = p->getUniformInfo(name);
-
-    if(count > pair.count){
-        LOG_ERROR("{0} has size of {1}, and be assigned with {2}", name, pair.count, count);
-        return -1;
-    }
-
-    INT* slots = m_texture_slots.at(name);
-    LOG_INFO("bind slot: {0}", slots[count - 1]);
-    return slots[count - 1];
+    return m_texture_slots.at(name);
 }
 
 void Material::assignTexture(const STRING& name, std::shared_ptr<Texture> texture){
@@ -75,14 +69,7 @@ void Material::assignTexture(const STRING& name, std::shared_ptr<Texture> textur
         return;
     }
 
-    auto p = program();
-    auto pair = p->getUniformInfo(name);
-
-    if(m_textures[name].size() >= pair.count){
-        return;
-    }
-
-    m_textures[name].push_back(texture);
+    m_textures[name]= texture;
 }
 
 void Material::getUniformInfo(){
@@ -149,13 +136,13 @@ void Material::getUniformInfo(){
             
         break;
         case GL_SAMPLER_2D:{
-            bind_slots = new INT[size];
+            bind_slots = new INT[1];
 			p->getUniformValue(key, bind_slots);
-            m_texture_slots[key] = bind_slots;
+            m_texture_slots[key] = bind_slots[0];
+
             m_textures[key] = {};
+
         }
-
-
 
             break;
         }
@@ -165,13 +152,8 @@ void Material::getUniformInfo(){
 
 
 void Material::bindSettings() const{
-    //if(m_material_settings.enable_depth){
-    //    glEnable(GL_DEPTH_TEST);
-    //    glDepthMask(m_material_settings.depth_written ? GL_TRUE : GL_FALSE);
-    //    glDepthFunc(static_cast<INT>(m_material_settings.depth_func));
-    //}else{
-    //    glDisable(GL_DEPTH_TEST);
-    //}
+	glDepthMask(m_material_settings.depth_written ? GL_TRUE : GL_FALSE);
+	glDepthFunc(static_cast<INT>(m_material_settings.depth_func));
 
     if(m_material_settings.is_cull){
         glEnable(GL_CULL_FACE);
@@ -182,6 +164,9 @@ void Material::bindSettings() const{
 
     glPolygonMode(GL_FRONT_AND_BACK, static_cast<INT>(m_material_settings.polygon_mode));
 
+    glEnable(GL_BLEND);
+    glBlendFunc(static_cast<int>(m_material_settings.src_factor), static_cast<int>(m_material_settings.dst_factor));
+    glBlendEquation(static_cast<int>(m_material_settings.blend_op));
 }
 
 MaterialSettings Material::materialSettings() const{

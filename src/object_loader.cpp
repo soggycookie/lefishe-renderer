@@ -118,18 +118,20 @@ using namespace Lefishe;
 					data.indices.push_back(face.mIndices[k]);
 			}
 
-			
-			std::shared_ptr<Material> mat = nullptr;
-			
-			if(auto mat_manager = m_material_manager.lock()){
-				mat = mat_manager->defaultMaterial();
-				mat_manager->addMaterial(mat);
+			if(m_material_manager.expired()){
+				LOG_ERROR("No material manager!");
+
 			}
 
-			
+			std::shared_ptr<Material> mat = m_material_manager.lock()->defaultMaterial();
+			m_material_manager.lock()->addMaterial(mat);
 
+			
 			auto mesh = parent_ptr->addComponent<MeshComponent>(data);
 			parent_ptr->addComponent<MeshRendererComponent>(mesh, mat);
+
+			
+
 
 			processMaterial(ai_mesh, scene, dir, mat);
 
@@ -192,7 +194,7 @@ void AssimpObjectLoader::processTexture(aiMaterial* material, const aiScene* sce
 
 		if(nullptr == tex) {
 			if(auto tex_manager = m_texture_manager.lock()) {
-				std::shared_ptr<Texture> tex = nullptr;
+				std::shared_ptr<Texture2D> tex = nullptr;
 				
 				const STRING rel_path = dir + "/" + path.C_Str(); 
 				tex = tex_manager->getTexture(rel_path.c_str());
@@ -288,26 +290,27 @@ STRING AssimpObjectLoader::textureEnumToString(aiTextureType type){
 	return str;
 }
 
-void AssimpObjectLoader::assignTextureToMaterial(aiTextureType type, const std::shared_ptr<Texture>& texture, const std::shared_ptr<Material>& obj_material){
+void AssimpObjectLoader::assignTextureToMaterial(aiTextureType type, const std::shared_ptr<Texture2D>& texture, const std::shared_ptr<Material>& obj_material){
 	switch(type) {
 		case aiTextureType_DIFFUSE:
 		{
+			LOG_TRACE("Diffuse added");
 			obj_material->assignTexture(DIFFUSE_UNIFORM_NAME, texture);
 			break;
 		}
 		case aiTextureType_SPECULAR:
 		{
-			obj_material->assignTexture(DIFFUSE_UNIFORM_NAME, texture);
+			obj_material->assignTexture(NORMAL_UNIFORM_NAME, texture);
 			break;
 		}
 		case aiTextureType_AMBIENT:
 		{
-			obj_material->assignTexture(DIFFUSE_UNIFORM_NAME, texture);
+			obj_material->assignTexture(NORMAL_UNIFORM_NAME, texture);
 			break;
 		}
 		case aiTextureType_EMISSIVE:
 		{
-			obj_material->assignTexture(DIFFUSE_UNIFORM_NAME, texture);
+			obj_material->assignTexture(NORMAL_UNIFORM_NAME, texture);
 			break;
 		}
 		case aiTextureType_NORMALS:
@@ -317,12 +320,12 @@ void AssimpObjectLoader::assignTextureToMaterial(aiTextureType type, const std::
 		}
 		case aiTextureType_OPACITY:
 		{
-			obj_material->assignTexture(DIFFUSE_UNIFORM_NAME, texture);
+			obj_material->assignTexture(NORMAL_UNIFORM_NAME, texture);
 			break;
 		}
 		case aiTextureType_SHININESS:
 		{
-			obj_material->assignTexture(DIFFUSE_UNIFORM_NAME, texture);
+			obj_material->assignTexture(NORMAL_UNIFORM_NAME, texture);
 			break;
 		}
 		case aiTextureType_BASE_COLOR:
@@ -332,17 +335,17 @@ void AssimpObjectLoader::assignTextureToMaterial(aiTextureType type, const std::
 		}
 		case aiTextureType_METALNESS:
 		{
-			obj_material->assignTexture(METALLIC_UNIFROM_NAME, texture);
+			obj_material->assignTexture(NORMAL_UNIFORM_NAME, texture);
 			break;
 		}
 		case aiTextureType_EMISSION_COLOR:
 		{
-			obj_material->assignTexture(DIFFUSE_UNIFORM_NAME, texture);
+			obj_material->assignTexture(NORMAL_UNIFORM_NAME, texture);
 			break;
 		}
 		case aiTextureType_DIFFUSE_ROUGHNESS:
 		{
-			obj_material->assignTexture(DIFFUSE_UNIFORM_NAME, texture);
+			obj_material->assignTexture(NORMAL_UNIFORM_NAME, texture);
 			break;
 		}
 		case aiTextureType_AMBIENT_OCCLUSION:

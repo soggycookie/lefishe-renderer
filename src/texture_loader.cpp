@@ -6,12 +6,12 @@
 
 using namespace Lefishe;
 
- std::shared_ptr<Texture> TextureLoader::load(const char* path){
+ std::shared_ptr<Texture2D> TextureLoader::load(const char* path){
 	INT tex_width  = 0;
 	INT tex_height = 0;
 	INT channels = 0;
 
-	std::shared_ptr<Texture> texture = nullptr;
+	std::shared_ptr<Texture2D> texture = nullptr;
 
 	stbi_set_flip_vertically_on_load(true);  
 	LOG_INFO("texture dir : {0} ", path);
@@ -31,20 +31,19 @@ using namespace Lefishe;
 
 		//UINT mip = std::log2(std::max(width, height) / 32);
 
-		TextureInfo info = 	
+		Texture2DInfo info = 	
 		{
-			.type = TextureType::TEX_2D,
 			.internal_format = internal_format,
 			.width = static_cast<UINT>(tex_width),
 			.height = static_cast<UINT>(tex_height),
 			.total_mip_levels = 1
 		};
 
-		texture = std::make_shared<Texture>(info);
+		texture = std::make_shared<Texture2D>(info);
 
 		texture->subDataTex2D(0, 0, 0, tex_width, tex_height, format, TexturePixelType::UBYTE, data);
-
-		LOG_INFO("width: {0} | height: {1} | channels: {2}", tex_width, tex_height, channels);
+		UINT id = texture->id();
+		LOG_INFO("width: {0} | height: {1} | channels: {2} | ID: {3}", tex_width, tex_height, channels, id);
 	}
 	else
 	{
