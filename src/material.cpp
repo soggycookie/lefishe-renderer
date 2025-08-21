@@ -164,9 +164,14 @@ void Material::bindSettings() const{
 
     glPolygonMode(GL_FRONT_AND_BACK, static_cast<INT>(m_material_settings.polygon_mode));
 
-    glEnable(GL_BLEND);
-    glBlendFunc(static_cast<int>(m_material_settings.src_factor), static_cast<int>(m_material_settings.dst_factor));
-    glBlendEquation(static_cast<int>(m_material_settings.blend_op));
+    if(m_material_settings.enable_blend && m_material_settings.geo_type == GeometryType::TRANSPARENT_GEO){
+        glEnable(GL_BLEND);
+        glBlendFunc(static_cast<int>(m_material_settings.src_factor), static_cast<int>(m_material_settings.dst_factor));
+        glBlendEquation(static_cast<int>(m_material_settings.blend_op));
+    }else{
+        glDisable(GL_BLEND);
+    }
+
 }
 
 MaterialSettings Material::materialSettings() const{

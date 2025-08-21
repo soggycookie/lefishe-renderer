@@ -66,7 +66,7 @@ void Shader::compile(const STRING& src) {
     if (!success)
     {
         glGetShaderInfoLog(m_id, 512, NULL, info_log);
-        LOG_ERROR("[SHADER] {0} compilation failed!", getStageStr());
+        LOG_ERROR("[SHADER] {0} compilation failed! \n [INFO] {1}", getStageStr(), info_log);
     }else{
 		LOG_TRACE("[SHADER] {0} compilation successfully!", getStageStr() );
     }

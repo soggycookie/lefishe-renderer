@@ -9,8 +9,7 @@ layout (location = 4) in vec2 aTexCoord;
 
 out vec2 TexCoord;
 out vec4 VertexColor;
-out vec3 normal;
-out vec3 tangent;
+out mat3 TBN;
 
 layout(std140, binding = 0) uniform Camera{
 	mat4 view;
@@ -24,8 +23,24 @@ void main()
 	gl_Position = projection * view * model * vec4(aPos, 1.0);
 	TexCoord = vec2(aTexCoord.x, aTexCoord.y);
 	VertexColor = aColor;
-	normal = vec3(model * vec4(aNormal, 1.0));
-	tangent = vec3(model * vec4(aTangent, 1.0));
+
+
+
+	vec3 T = normalize(vec3(model * vec4(aTangent,   0.0)));
+	vec3 N = normalize(vec3(model * vec4(aNormal,    0.0)));
+	
+	//Gram-Schmidt
+	T = normalize(T - dot(T, N) * N);
+
+	vec3 bitangent = cross(N, T);
+
+	vec3 B = normalize(vec3(model * vec4(bitangent, 0.0)));
+
+	// if (dot(cross(N, T), vec3(model * vec4(cross(aNormal, aTangent), 0.0))) < 0.0) {
+	// 	B = -B;
+	// }
+
+	TBN = mat3(T, B, N);
 }
 
 
@@ -36,22 +51,33 @@ out vec4 FragColor;
 
 in vec2 TexCoord;
 in vec4 VertexColor;
-in vec3 normal;
-in vec3 tangent;
+in mat3 TBN;
 
 
 
 layout(binding = 0) uniform sampler2D diffuseMap;
-// layout(binding = 1) uniform sampler2D normalMap;
+layout(binding = 1) uniform sampler2D normalMap;
 // layout(binding = 2) uniform sampler2D metallicMap;
 
-// layout(binding = 1) uniform sampler2D arr[3];
 
 vec4 color = vec4(1.0);
 
 void main()
 {
-	//vec4 col = texture(diffuseMap, TexCoord) * texture(normalMap, TexCoord) * texture(metallicMap, TexCoord);
+	vec4 baseColor = texture(diffuseMap, TexCoord);
+	vec3 normal = texture(normalMap, TexCoord).xyz;
+	normal = normal * 2 - 1;
 
-	FragColor = vec4(texture(diffuseMap, TexCoord).xyz, 1) ;
+	normal = normalize(TBN * normal);
+
+	vec3 lightDir = normalize(vec3(1, 1, 0));
+	
+
+	float diffuse = clamp(dot(lightDir, normal), 0 , 1);
+
+	vec3 finalColor = baseColor.xyz * diffuse + baseColor.xyz * 0.1;
+
+	//vec3 check = TBN[0] * 0.5 + vec3(0.5);
+
+	FragColor =  vec4(finalColor, 1);
 }

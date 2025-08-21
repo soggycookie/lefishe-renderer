@@ -65,6 +65,8 @@ using namespace Lefishe;
 		for (unsigned int i = 0; i < node->mNumMeshes; i++) {
 			aiMesh* ai_mesh = scene->mMeshes[node->mMeshes[i]];
 
+
+
 			data.clear();
 
 			data.vertices.resize(ai_mesh->mNumVertices);

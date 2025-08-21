@@ -24,4 +24,6 @@ bin/
 
 .vs/
 
-external/*
+external/glfw
+external/assimp
+external/spdlog
