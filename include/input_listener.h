@@ -179,8 +179,8 @@ namespace Lefishe {
 
 	private:
 		WindowObject* m_window_object = nullptr;
-        std::array<BOOL, GLFW_KEY_LAST> m_key_state;
-        std::array<BOOL, 3> m_mouse_state;
+        std::array<bool, GLFW_KEY_LAST> m_key_state;
+        std::array<bool, 3> m_mouse_state;
 
         IVEC2 m_cursor_pos = IVEC2(0);
         IVEC2 m_last_cursor_pos = VEC2(0.0f);

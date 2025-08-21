@@ -15,7 +15,7 @@ namespace Lefishe {
 		UINT screen_width = 1280;
 		UINT screen_height = 720;
 		STRINGVIEW name = "Lefishe Renderer";
-		BOOL is_full_screen = false;
+		bool is_full_screen = false;
 	};
 
 	struct FrameData {
